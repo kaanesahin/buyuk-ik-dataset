@@ -1,0 +1,2717 @@
+[
+  {
+    "_meta": {
+      "id": "hr_val_00077",
+      "split": "val",
+      "decision": "cannot_answer",
+      "intent": "bulk_process_all_requests",
+      "domain": "ik_islemleri",
+      "difficulty": "zor",
+      "register": "gundelik",
+      "is_write": false,
+      "confirmation_required": false,
+      "missing_parameters": []
+    },
+    "tools": [
+      {
+        "name": "cancel_izin_talebi",
+        "description": "Mevcut bir izin talebini iptal eder. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "talep_id": {
+              "type": "string",
+              "description": "İptal edilecek izin talebinin kimliği, 'LV-2026-0001' biçiminde"
+            }
+          },
+          "required": [
+            "talep_id"
+          ]
+        }
+      },
+      {
+        "name": "update_employee_information",
+        "description": "Bir çalışanın özlük kayıt bilgilerini (medeni durum, öğrenim durumu, acil durum kişisi) günceller. İletişim bilgileri için update_employee_contact kullanılır. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "medeni_durum": {
+              "type": "string",
+              "description": "Yeni medeni durum",
+              "enum": [
+                "bekar",
+                "evli",
+                "bosanmis",
+                "dul"
+              ]
+            },
+            "ogrenim_durumu": {
+              "type": "string",
+              "description": "Yeni öğrenim durumu",
+              "enum": [
+                "lise",
+                "onlisans",
+                "lisans",
+                "yuksek_lisans",
+                "doktora"
+              ]
+            },
+            "acil_durum_kisisi": {
+              "type": "string",
+              "description": "Acil durumda aranacak kişinin adı"
+            },
+            "acil_durum_telefonu": {
+              "type": "string",
+              "description": "Acil durumda aranacak telefon numarası"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "create_izin_talebi",
+        "description": "Bir çalışan için yeni izin talebi oluşturur. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "izin_tipi": {
+              "type": "string",
+              "description": "İzin türü",
+              "enum": [
+                "yillik",
+                "mazeret",
+                "hastalik"
+              ]
+            },
+            "baslangic_tarihi": {
+              "type": "string",
+              "description": "İzin başlangıç tarihi, YYYY-AA-GG"
+            },
+            "bitis_tarihi": {
+              "type": "string",
+              "description": "İzin bitiş tarihi, YYYY-AA-GG"
+            },
+            "aciklama": {
+              "type": "string",
+              "description": "İsteğe bağlı açıklama / gerekçe"
+            }
+          },
+          "required": [
+            "employee_id",
+            "izin_tipi",
+            "baslangic_tarihi",
+            "bitis_tarihi"
+          ]
+        }
+      },
+      {
+        "name": "check_employee_access",
+        "description": "Bir talep edenin, başka bir çalışanın belirli bir kaynağına (maaş, izin, iletişim, bordro, performans) erişim yetkisi olup olmadığını kontrol eder.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "requester_id": {
+              "type": "string",
+              "description": "Talep eden çalışanın personel kimliği"
+            },
+            "hedef_employee_id": {
+              "type": "string",
+              "description": "Erişilmek istenen çalışanın personel kimliği"
+            },
+            "kaynak_tipi": {
+              "type": "string",
+              "description": "Erişilmek istenen kaynak türü",
+              "enum": [
+                "maas",
+                "izin",
+                "iletisim",
+                "bordro",
+                "performans"
+              ]
+            }
+          },
+          "required": [
+            "requester_id",
+            "hedef_employee_id",
+            "kaynak_tipi"
+          ]
+        }
+      },
+      {
+        "name": "update_employee_contact",
+        "description": "Bir çalışanın iletişim bilgilerini (telefon, e-posta, adres) günceller. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "telefon": {
+              "type": "string",
+              "description": "Yeni telefon numarası"
+            },
+            "email": {
+              "type": "string",
+              "description": "Yeni e-posta adresi"
+            },
+            "adres": {
+              "type": "string",
+              "description": "Yeni ikamet adresi"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "update_izin_talebi",
+        "description": "Mevcut bir izin talebinin tarihlerini günceller. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "talep_id": {
+              "type": "string",
+              "description": "Güncellenecek izin talebinin kimliği"
+            },
+            "yeni_baslangic_tarihi": {
+              "type": "string",
+              "description": "Yeni başlangıç tarihi, YYYY-AA-GG"
+            },
+            "yeni_bitis_tarihi": {
+              "type": "string",
+              "description": "Yeni bitiş tarihi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "talep_id"
+          ]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Departmandaki açık talepleri hepsini birden sonuçlandır."
+      },
+      {
+        "role": "assistant",
+        "content": "Bu değişikliği yapacak bir aracım yok; ilgili adım İK / yönetici tarafında yürür. Talebinizi doğru kanaldan (yöneticiniz / İK ekibi) iletmeniz gerekir."
+      },
+      {
+        "role": "user",
+        "content": "Başka bir yolu yok mu?"
+      },
+      {
+        "role": "assistant",
+        "content": "Bu talebi karşılayamıyorum; ısrar etseniz de veremeyeceğim bir bilgi bu. İzin, maaş, bordro veya puantaj konularında destek olabilirim."
+      }
+    ]
+  },
+  {
+    "_meta": {
+      "id": "hr_val_00197",
+      "split": "val",
+      "decision": "cannot_answer",
+      "intent": "cafeteria_menu",
+      "domain": "kapsanmayan",
+      "difficulty": "kolay",
+      "register": "konusma_dili",
+      "is_write": false,
+      "confirmation_required": false,
+      "missing_parameters": []
+    },
+    "tools": [
+      {
+        "name": "get_puantaj",
+        "description": "Bir çalışanın belirli bir tarih aralığındaki puantaj kaydını (çalışılan gün, giriş/çıkış, devamsızlık) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "baslangic_tarihi": {
+              "type": "string",
+              "description": "Aralık başlangıcı, YYYY-AA-GG"
+            },
+            "bitis_tarihi": {
+              "type": "string",
+              "description": "Aralık bitişi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id",
+            "baslangic_tarihi",
+            "bitis_tarihi"
+          ]
+        }
+      },
+      {
+        "name": "update_employee_contact",
+        "description": "Bir çalışanın iletişim bilgilerini (telefon, e-posta, adres) günceller. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "telefon": {
+              "type": "string",
+              "description": "Yeni telefon numarası"
+            },
+            "email": {
+              "type": "string",
+              "description": "Yeni e-posta adresi"
+            },
+            "adres": {
+              "type": "string",
+              "description": "Yeni ikamet adresi"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_yonetici_bilgisi",
+        "description": "Bir çalışanın bağlı olduğu yöneticinin bilgisini getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "update_izin_talebi",
+        "description": "Mevcut bir izin talebinin tarihlerini günceller. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "talep_id": {
+              "type": "string",
+              "description": "Güncellenecek izin talebinin kimliği"
+            },
+            "yeni_baslangic_tarihi": {
+              "type": "string",
+              "description": "Yeni başlangıç tarihi, YYYY-AA-GG"
+            },
+            "yeni_bitis_tarihi": {
+              "type": "string",
+              "description": "Yeni bitiş tarihi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "talep_id"
+          ]
+        }
+      },
+      {
+        "name": "cancel_izin_talebi",
+        "description": "Mevcut bir izin talebini iptal eder. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "talep_id": {
+              "type": "string",
+              "description": "İptal edilecek izin talebinin kimliği, 'LV-2026-0001' biçiminde"
+            }
+          },
+          "required": [
+            "talep_id"
+          ]
+        }
+      },
+      {
+        "name": "get_maas_bilgisi",
+        "description": "Bir çalışanın güncel maaş bilgisini getirir. 'tur' verilmezse hem net hem brüt döndürülür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "tur": {
+              "type": "string",
+              "description": "Maaş türü",
+              "enum": [
+                "net",
+                "brut"
+              ]
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Abi ogle menusu ne"
+      },
+      {
+        "role": "assistant",
+        "content": "Açık olmak gerekirse, bu isteği yerine getirebilecek bir yeteneğim yok. Yardımcı olabileceğim bir İK konusu varsa memnuniyetle bakarım."
+      }
+    ]
+  },
+  {
+    "_meta": {
+      "id": "hr_val_00100",
+      "split": "val",
+      "decision": "cannot_answer",
+      "intent": "compare_others_salaries",
+      "domain": "maas_finans",
+      "difficulty": "zor",
+      "register": "kisa",
+      "is_write": false,
+      "confirmation_required": false,
+      "missing_parameters": []
+    },
+    "tools": [
+      {
+        "name": "create_pozisyon_degisiklik_talebi",
+        "description": "Bir çalışan için pozisyon / unvan değişikliği talebi oluşturur. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "yeni_pozisyon": {
+              "type": "string",
+              "description": "Talep edilen yeni pozisyon / unvan"
+            },
+            "gerekce": {
+              "type": "string",
+              "description": "İsteğe bağlı gerekçe"
+            },
+            "gecerlilik_tarihi": {
+              "type": "string",
+              "description": "Geçerlilik tarihi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id",
+            "yeni_pozisyon"
+          ]
+        }
+      },
+      {
+        "name": "get_bordro",
+        "description": "Bir çalışanın belirli bir aya ait bordro (maaş pusulası) dökümünü getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "donem": {
+              "type": "string",
+              "description": "Bordro dönemi, YYYY-AA biçiminde"
+            }
+          },
+          "required": [
+            "employee_id",
+            "donem"
+          ]
+        }
+      },
+      {
+        "name": "create_izin_talebi",
+        "description": "Bir çalışan için yeni izin talebi oluşturur. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "izin_tipi": {
+              "type": "string",
+              "description": "İzin türü",
+              "enum": [
+                "yillik",
+                "mazeret",
+                "hastalik"
+              ]
+            },
+            "baslangic_tarihi": {
+              "type": "string",
+              "description": "İzin başlangıç tarihi, YYYY-AA-GG"
+            },
+            "bitis_tarihi": {
+              "type": "string",
+              "description": "İzin bitiş tarihi, YYYY-AA-GG"
+            },
+            "aciklama": {
+              "type": "string",
+              "description": "İsteğe bağlı açıklama / gerekçe"
+            }
+          },
+          "required": [
+            "employee_id",
+            "izin_tipi",
+            "baslangic_tarihi",
+            "bitis_tarihi"
+          ]
+        }
+      },
+      {
+        "name": "get_maas_bilgisi",
+        "description": "Bir çalışanın güncel maaş bilgisini getirir. 'tur' verilmezse hem net hem brüt döndürülür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "tur": {
+              "type": "string",
+              "description": "Maaş türü",
+              "enum": [
+                "net",
+                "brut"
+              ]
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_prim_bilgisi",
+        "description": "Bir çalışanın prim / bonus ödemelerini getirir. Dönem verilmezse yürürlükteki yılı döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "donem": {
+              "type": "string",
+              "description": "Prim dönemi, YYYY veya YYYY-AA biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_mesai_bilgisi",
+        "description": "Bir çalışanın belirli bir aya ait fazla mesai (ek çalışma) saatlerini ve karşılığını getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "donem": {
+              "type": "string",
+              "description": "Dönem, YYYY-AA biçiminde"
+            }
+          },
+          "required": [
+            "employee_id",
+            "donem"
+          ]
+        }
+      },
+      {
+        "name": "create_ucret_degisiklik_talebi",
+        "description": "Bir çalışan için ücret değişikliği talebi oluşturur. Değişiklik yaratan hassas bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "yeni_brut_ucret": {
+              "type": "number",
+              "description": "Talep edilen yeni brüt aylık ücret"
+            },
+            "gerekce": {
+              "type": "string",
+              "description": "Ücret değişikliği gerekçesi"
+            },
+            "gecerlilik_tarihi": {
+              "type": "string",
+              "description": "Değişikliğin geçerli olacağı tarih, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id",
+            "yeni_brut_ucret",
+            "gerekce"
+          ]
+        }
+      },
+      {
+        "name": "get_yan_haklar",
+        "description": "Bir çalışanın yan haklarını (özel sağlık sigortası, yemek kartı, ulaşım, BES katkısı vb.) listeler.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "ekipteki herkesin maasini kiyasla"
+      },
+      {
+        "role": "assistant",
+        "content": "Maalesef çalışanların birbirinin maaş, izin veya iletişim bilgilerine erişimi yoktur. Yetki durumunuzu birlikte kontrol etmemi isterseniz söyleyin."
+      }
+    ]
+  },
+  {
+    "_meta": {
+      "id": "hr_000585",
+      "split": "train",
+      "decision": "cannot_answer",
+      "intent": "coworker_leave_records",
+      "domain": "izin_yonetimi",
+      "difficulty": "orta",
+      "register": "resmi",
+      "is_write": false,
+      "confirmation_required": false,
+      "missing_parameters": []
+    },
+    "tools": [
+      {
+        "name": "get_izin_gecmisi",
+        "description": "Bir çalışanın geçmişte KULLANDIĞI izin kayıtlarını (tarih, tür, gün sayısı) listeler. Tarih aralığı verilmezse son 12 ayı döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "baslangic_tarihi": {
+              "type": "string",
+              "description": "Aralık başlangıcı, YYYY-AA-GG"
+            },
+            "bitis_tarihi": {
+              "type": "string",
+              "description": "Aralık bitişi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "create_izin_talebi",
+        "description": "Bir çalışan için yeni izin talebi oluşturur. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "izin_tipi": {
+              "type": "string",
+              "description": "İzin türü",
+              "enum": [
+                "yillik",
+                "mazeret",
+                "hastalik"
+              ]
+            },
+            "baslangic_tarihi": {
+              "type": "string",
+              "description": "İzin başlangıç tarihi, YYYY-AA-GG"
+            },
+            "bitis_tarihi": {
+              "type": "string",
+              "description": "İzin bitiş tarihi, YYYY-AA-GG"
+            },
+            "aciklama": {
+              "type": "string",
+              "description": "İsteğe bağlı açıklama / gerekçe"
+            }
+          },
+          "required": [
+            "employee_id",
+            "izin_tipi",
+            "baslangic_tarihi",
+            "bitis_tarihi"
+          ]
+        }
+      },
+      {
+        "name": "cancel_izin_talebi",
+        "description": "Mevcut bir izin talebini iptal eder. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "talep_id": {
+              "type": "string",
+              "description": "İptal edilecek izin talebinin kimliği, 'LV-2026-0001' biçiminde"
+            }
+          },
+          "required": [
+            "talep_id"
+          ]
+        }
+      },
+      {
+        "name": "get_izin_talebi_durumu",
+        "description": "Bir çalışanın izin taleplerinin onay durumunu (beklemede, onaylandı, reddedildi) getirir. talep_id verilmezse en son talebi döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "talep_id": {
+              "type": "string",
+              "description": "İzin talebinin kimliği, 'LV-2026-0001' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_izin_bakiyesi",
+        "description": "Bir çalışanın izin türüne göre KALAN (kullanılabilir) izin bakiyesini getirir. İzin türü verilmezse tüm türlerin özetini döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "izin_tipi": {
+              "type": "string",
+              "description": "Sorgulanacak izin türü",
+              "enum": [
+                "yillik",
+                "mazeret",
+                "hastalik"
+              ]
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Bilgi talebi — ekip arkadasimin izin gecmisini goster. Yardımlarınız için şimdiden teşekkür ederim."
+      },
+      {
+        "role": "assistant",
+        "content": "Kusura bakmayın ama bu veriye erişim özel yetki gerektiriyor; bu asistan üzerinden başkasının özel bilgisini açamam. Kendi bilgilerinizi sorarsanız yardımcı olabilirim."
+      }
+    ]
+  },
+  {
+    "_meta": {
+      "id": "hr_001921",
+      "split": "train",
+      "decision": "cannot_answer",
+      "intent": "coworker_position_history",
+      "domain": "calisan_bilgileri",
+      "difficulty": "zor",
+      "register": "uzun",
+      "is_write": false,
+      "confirmation_required": false,
+      "missing_parameters": []
+    },
+    "tools": [
+      {
+        "name": "update_employee_information",
+        "description": "Bir çalışanın özlük kayıt bilgilerini (medeni durum, öğrenim durumu, acil durum kişisi) günceller. İletişim bilgileri için update_employee_contact kullanılır. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "medeni_durum": {
+              "type": "string",
+              "description": "Yeni medeni durum",
+              "enum": [
+                "bekar",
+                "evli",
+                "bosanmis",
+                "dul"
+              ]
+            },
+            "ogrenim_durumu": {
+              "type": "string",
+              "description": "Yeni öğrenim durumu",
+              "enum": [
+                "lise",
+                "onlisans",
+                "lisans",
+                "yuksek_lisans",
+                "doktora"
+              ]
+            },
+            "acil_durum_kisisi": {
+              "type": "string",
+              "description": "Acil durumda aranacak kişinin adı"
+            },
+            "acil_durum_telefonu": {
+              "type": "string",
+              "description": "Acil durumda aranacak telefon numarası"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_employee_status",
+        "description": "Bir çalışanın güncel çalışma durumunu (aktif, izinli, ücretsiz izinde, ayrıldı) döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_calisan_listesi",
+        "description": "Bir departmandaki çalışanların listesini getirir; duruma göre filtrelenebilir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "departman_adi": {
+              "type": "string",
+              "description": "Departmanın adı"
+            },
+            "durum": {
+              "type": "string",
+              "description": "Çalışma durumu filtresi",
+              "enum": [
+                "aktif",
+                "izinli",
+                "ayrildi"
+              ]
+            }
+          },
+          "required": [
+            "departman_adi"
+          ]
+        }
+      },
+      {
+        "name": "get_employee_info",
+        "description": "Bir çalışanın temel kayıt bilgilerini (ad, departman, pozisyon, işe giriş tarihi, yöneticisi) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "update_employee_contact",
+        "description": "Bir çalışanın iletişim bilgilerini (telefon, e-posta, adres) günceller. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "telefon": {
+              "type": "string",
+              "description": "Yeni telefon numarası"
+            },
+            "email": {
+              "type": "string",
+              "description": "Yeni e-posta adresi"
+            },
+            "adres": {
+              "type": "string",
+              "description": "Yeni ikamet adresi"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_departman_bilgisi",
+        "description": "Bir departmanın özet bilgisini (yönetici, çalışan sayısı, alt ekipler) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "departman_adi": {
+              "type": "string",
+              "description": "Departmanın adı, örn. 'Yazılım Geliştirme'"
+            }
+          },
+          "required": [
+            "departman_adi"
+          ]
+        }
+      },
+      {
+        "name": "get_yonetici_bilgisi",
+        "description": "Bir çalışanın bağlı olduğu yöneticinin bilgisini getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_izin_talebi_durumu",
+        "description": "Bir çalışanın izin taleplerinin onay durumunu (beklemede, onaylandı, reddedildi) getirir. talep_id verilmezse en son talebi döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "talep_id": {
+              "type": "string",
+              "description": "İzin talebinin kimliği, 'LV-2026-0001' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Sabahtan beri bununla uğraşıyorum, bir türlü emin olamadım. Ekip liderimizin geçmiş unvanlarını ve terfi tarihlerini listele. Buna göre ilerleyeceğim, teşekkürler."
+      },
+      {
+        "role": "assistant",
+        "content": "Bu veriye erişim özel yetki gerektiriyor; bu asistan üzerinden başkasının özel bilgisini açamam. Kendi bilgilerinizi sorarsanız yardımcı olabilirim."
+      }
+    ]
+  },
+  {
+    "_meta": {
+      "id": "hr_002462",
+      "split": "train",
+      "decision": "cannot_answer",
+      "intent": "coworker_timesheet",
+      "domain": "puantaj",
+      "difficulty": "orta",
+      "register": "resmi",
+      "is_write": false,
+      "confirmation_required": false,
+      "missing_parameters": []
+    },
+    "tools": [
+      {
+        "name": "get_puantaj",
+        "description": "Bir çalışanın belirli bir tarih aralığındaki puantaj kaydını (çalışılan gün, giriş/çıkış, devamsızlık) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "baslangic_tarihi": {
+              "type": "string",
+              "description": "Aralık başlangıcı, YYYY-AA-GG"
+            },
+            "bitis_tarihi": {
+              "type": "string",
+              "description": "Aralık bitişi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id",
+            "baslangic_tarihi",
+            "bitis_tarihi"
+          ]
+        }
+      },
+      {
+        "name": "get_izin_talebi_durumu",
+        "description": "Bir çalışanın izin taleplerinin onay durumunu (beklemede, onaylandı, reddedildi) getirir. talep_id verilmezse en son talebi döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "talep_id": {
+              "type": "string",
+              "description": "İzin talebinin kimliği, 'LV-2026-0001' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_mesai_bilgisi",
+        "description": "Bir çalışanın belirli bir aya ait fazla mesai (ek çalışma) saatlerini ve karşılığını getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "donem": {
+              "type": "string",
+              "description": "Dönem, YYYY-AA biçiminde"
+            }
+          },
+          "required": [
+            "employee_id",
+            "donem"
+          ]
+        }
+      },
+      {
+        "name": "get_employee_status",
+        "description": "Bir çalışanın güncel çalışma durumunu (aktif, izinli, ücretsiz izinde, ayrıldı) döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "İlgili birime iletilmek üzere: mehmet'in dün kaçta giriş yaptığını öğrenebilir miyim. Yardımlarınız için şimdiden teşekkür ederim."
+      },
+      {
+        "role": "assistant",
+        "content": "Bu konuda yardımcı olamıyorum. Bu veriye erişim özel yetki gerektiriyor; bu asistan üzerinden başkasının özel bilgisini açamam."
+      }
+    ]
+  },
+  {
+    "_meta": {
+      "id": "hr_val_00121",
+      "split": "val",
+      "decision": "cannot_answer",
+      "intent": "export_full_org_pdf",
+      "domain": "organizasyon",
+      "difficulty": "cok_zor",
+      "register": "uzun",
+      "is_write": false,
+      "confirmation_required": false,
+      "missing_parameters": []
+    },
+    "tools": [
+      {
+        "name": "get_calisan_listesi",
+        "description": "Bir departmandaki çalışanların listesini getirir; duruma göre filtrelenebilir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "departman_adi": {
+              "type": "string",
+              "description": "Departmanın adı"
+            },
+            "durum": {
+              "type": "string",
+              "description": "Çalışma durumu filtresi",
+              "enum": [
+                "aktif",
+                "izinli",
+                "ayrildi"
+              ]
+            }
+          },
+          "required": [
+            "departman_adi"
+          ]
+        }
+      },
+      {
+        "name": "get_employee_status",
+        "description": "Bir çalışanın güncel çalışma durumunu (aktif, izinli, ücretsiz izinde, ayrıldı) döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_yonetici_bilgisi",
+        "description": "Bir çalışanın bağlı olduğu yöneticinin bilgisini getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "create_pozisyon_degisiklik_talebi",
+        "description": "Bir çalışan için pozisyon / unvan değişikliği talebi oluşturur. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "yeni_pozisyon": {
+              "type": "string",
+              "description": "Talep edilen yeni pozisyon / unvan"
+            },
+            "gerekce": {
+              "type": "string",
+              "description": "İsteğe bağlı gerekçe"
+            },
+            "gecerlilik_tarihi": {
+              "type": "string",
+              "description": "Geçerlilik tarihi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id",
+            "yeni_pozisyon"
+          ]
+        }
+      },
+      {
+        "name": "get_departman_bilgisi",
+        "description": "Bir departmanın özet bilgisini (yönetici, çalışan sayısı, alt ekipler) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "departman_adi": {
+              "type": "string",
+              "description": "Departmanın adı, örn. 'Yazılım Geliştirme'"
+            }
+          },
+          "required": [
+            "departman_adi"
+          ]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Yöneticimle görüşmeden önce bir şeyi netleştirmem gerekiyor. Şirketin tam hiyerarşisini görsel dosya olarak hazırla. Acele etmiyorum ama bugün içinde lazım."
+      },
+      {
+        "role": "assistant",
+        "content": "Maalesef mevcut İK servisleri bu bilgiyi sağlamıyor."
+      },
+      {
+        "role": "user",
+        "content": "Emin olmasan da söyle."
+      },
+      {
+        "role": "assistant",
+        "content": "Bu konuda bir adım atamıyorum. Dilerseniz bunu İK ekibinize iletmenizi öneririm."
+      }
+    ]
+  },
+  {
+    "_meta": {
+      "id": "hr_001084",
+      "split": "train",
+      "decision": "cannot_answer",
+      "intent": "general_chitchat_offtopic",
+      "domain": "kapsanmayan",
+      "difficulty": "orta",
+      "register": "uzun",
+      "is_write": false,
+      "confirmation_required": false,
+      "missing_parameters": []
+    },
+    "tools": [
+      {
+        "name": "get_bordro",
+        "description": "Bir çalışanın belirli bir aya ait bordro (maaş pusulası) dökümünü getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "donem": {
+              "type": "string",
+              "description": "Bordro dönemi, YYYY-AA biçiminde"
+            }
+          },
+          "required": [
+            "employee_id",
+            "donem"
+          ]
+        }
+      },
+      {
+        "name": "get_izin_bakiyesi",
+        "description": "Bir çalışanın izin türüne göre KALAN (kullanılabilir) izin bakiyesini getirir. İzin türü verilmezse tüm türlerin özetini döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "izin_tipi": {
+              "type": "string",
+              "description": "Sorgulanacak izin türü",
+              "enum": [
+                "yillik",
+                "mazeret",
+                "hastalik"
+              ]
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_departman_bilgisi",
+        "description": "Bir departmanın özet bilgisini (yönetici, çalışan sayısı, alt ekipler) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "departman_adi": {
+              "type": "string",
+              "description": "Departmanın adı, örn. 'Yazılım Geliştirme'"
+            }
+          },
+          "required": [
+            "departman_adi"
+          ]
+        }
+      },
+      {
+        "name": "get_izin_talebi_durumu",
+        "description": "Bir çalışanın izin taleplerinin onay durumunu (beklemede, onaylandı, reddedildi) getirir. talep_id verilmezse en son talebi döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "talep_id": {
+              "type": "string",
+              "description": "İzin talebinin kimliği, 'LV-2026-0001' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_employee_info",
+        "description": "Bir çalışanın temel kayıt bilgilerini (ad, departman, pozisyon, işe giriş tarihi, yöneticisi) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "update_izin_talebi",
+        "description": "Mevcut bir izin talebinin tarihlerini günceller. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "talep_id": {
+              "type": "string",
+              "description": "Güncellenecek izin talebinin kimliği"
+            },
+            "yeni_baslangic_tarihi": {
+              "type": "string",
+              "description": "Yeni başlangıç tarihi, YYYY-AA-GG"
+            },
+            "yeni_bitis_tarihi": {
+              "type": "string",
+              "description": "Yeni bitiş tarihi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "talep_id"
+          ]
+        }
+      },
+      {
+        "name": "get_mesai_bilgisi",
+        "description": "Bir çalışanın belirli bir aya ait fazla mesai (ek çalışma) saatlerini ve karşılığını getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "donem": {
+              "type": "string",
+              "description": "Dönem, YYYY-AA biçiminde"
+            }
+          },
+          "required": [
+            "employee_id",
+            "donem"
+          ]
+        }
+      },
+      {
+        "name": "get_yan_haklar",
+        "description": "Bir çalışanın yan haklarını (özel sağlık sigortası, yemek kartı, ulaşım, BES katkısı vb.) listeler.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "İK portalında bulamadım, o yüzden buradan soruyorum. En sevdiğin film ne? Yanlış bir şey yapmak istemiyorum, o yüzden soruyorum."
+      },
+      {
+        "role": "assistant",
+        "content": "Açık olmak gerekirse, elimdeki araçlar yalnızca İK kayıtlarını sorgulayabiliyor, bu bunlardan biri değil."
+      }
+    ]
+  },
+  {
+    "_meta": {
+      "id": "hr_001389",
+      "split": "train",
+      "decision": "cannot_answer",
+      "intent": "guarantee_leave_approval",
+      "domain": "izin_yonetimi",
+      "difficulty": "orta",
+      "register": "resmi",
+      "is_write": false,
+      "confirmation_required": false,
+      "missing_parameters": []
+    },
+    "tools": [
+      {
+        "name": "create_izin_talebi",
+        "description": "Bir çalışan için yeni izin talebi oluşturur. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "izin_tipi": {
+              "type": "string",
+              "description": "İzin türü",
+              "enum": [
+                "yillik",
+                "mazeret",
+                "hastalik"
+              ]
+            },
+            "baslangic_tarihi": {
+              "type": "string",
+              "description": "İzin başlangıç tarihi, YYYY-AA-GG"
+            },
+            "bitis_tarihi": {
+              "type": "string",
+              "description": "İzin bitiş tarihi, YYYY-AA-GG"
+            },
+            "aciklama": {
+              "type": "string",
+              "description": "İsteğe bağlı açıklama / gerekçe"
+            }
+          },
+          "required": [
+            "employee_id",
+            "izin_tipi",
+            "baslangic_tarihi",
+            "bitis_tarihi"
+          ]
+        }
+      },
+      {
+        "name": "get_puantaj",
+        "description": "Bir çalışanın belirli bir tarih aralığındaki puantaj kaydını (çalışılan gün, giriş/çıkış, devamsızlık) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "baslangic_tarihi": {
+              "type": "string",
+              "description": "Aralık başlangıcı, YYYY-AA-GG"
+            },
+            "bitis_tarihi": {
+              "type": "string",
+              "description": "Aralık bitişi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id",
+            "baslangic_tarihi",
+            "bitis_tarihi"
+          ]
+        }
+      },
+      {
+        "name": "get_izin_bakiyesi",
+        "description": "Bir çalışanın izin türüne göre KALAN (kullanılabilir) izin bakiyesini getirir. İzin türü verilmezse tüm türlerin özetini döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "izin_tipi": {
+              "type": "string",
+              "description": "Sorgulanacak izin türü",
+              "enum": [
+                "yillik",
+                "mazeret",
+                "hastalik"
+              ]
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "cancel_izin_talebi",
+        "description": "Mevcut bir izin talebini iptal eder. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "talep_id": {
+              "type": "string",
+              "description": "İptal edilecek izin talebinin kimliği, 'LV-2026-0001' biçiminde"
+            }
+          },
+          "required": [
+            "talep_id"
+          ]
+        }
+      },
+      {
+        "name": "get_yan_haklar",
+        "description": "Bir çalışanın yan haklarını (özel sağlık sigortası, yemek kartı, ulaşım, BES katkısı vb.) listeler.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_izin_talebi_durumu",
+        "description": "Bir çalışanın izin taleplerinin onay durumunu (beklemede, onaylandı, reddedildi) getirir. talep_id verilmezse en son talebi döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "talep_id": {
+              "type": "string",
+              "description": "İzin talebinin kimliği, 'LV-2026-0001' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_izin_gecmisi",
+        "description": "Bir çalışanın geçmişte KULLANDIĞI izin kayıtlarını (tarih, tür, gün sayısı) listeler. Tarih aralığı verilmezse son 12 ayı döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "baslangic_tarihi": {
+              "type": "string",
+              "description": "Aralık başlangıcı, YYYY-AA-GG"
+            },
+            "bitis_tarihi": {
+              "type": "string",
+              "description": "Aralık bitişi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Sayın yetkili, bu izin talebi %100 geçer mi. Bilgilerinize arz ederim."
+      },
+      {
+        "role": "assistant",
+        "content": "Bu geleceğe dönük ve doğrulanamaz bir bilgi; Büyük İK araçları böyle bir tahmin üretmiyor. Dilerseniz mevcut kayıtlara bakabilirim."
+      }
+    ]
+  },
+  {
+    "_meta": {
+      "id": "hr_001894",
+      "split": "train",
+      "decision": "cannot_answer",
+      "intent": "highest_paid_employee",
+      "domain": "maas_finans",
+      "difficulty": "orta",
+      "register": "konusma_dili",
+      "is_write": false,
+      "confirmation_required": false,
+      "missing_parameters": []
+    },
+    "tools": [
+      {
+        "name": "get_yan_haklar",
+        "description": "Bir çalışanın yan haklarını (özel sağlık sigortası, yemek kartı, ulaşım, BES katkısı vb.) listeler.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_bordro",
+        "description": "Bir çalışanın belirli bir aya ait bordro (maaş pusulası) dökümünü getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "donem": {
+              "type": "string",
+              "description": "Bordro dönemi, YYYY-AA biçiminde"
+            }
+          },
+          "required": [
+            "employee_id",
+            "donem"
+          ]
+        }
+      },
+      {
+        "name": "get_maas_bilgisi",
+        "description": "Bir çalışanın güncel maaş bilgisini getirir. 'tur' verilmezse hem net hem brüt döndürülür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "tur": {
+              "type": "string",
+              "description": "Maaş türü",
+              "enum": [
+                "net",
+                "brut"
+              ]
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_prim_bilgisi",
+        "description": "Bir çalışanın prim / bonus ödemelerini getirir. Dönem verilmezse yürürlükteki yılı döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "donem": {
+              "type": "string",
+              "description": "Prim dönemi, YYYY veya YYYY-AA biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "create_ucret_degisiklik_talebi",
+        "description": "Bir çalışan için ücret değişikliği talebi oluşturur. Değişiklik yaratan hassas bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "yeni_brut_ucret": {
+              "type": "number",
+              "description": "Talep edilen yeni brüt aylık ücret"
+            },
+            "gerekce": {
+              "type": "string",
+              "description": "Ücret değişikliği gerekçesi"
+            },
+            "gecerlilik_tarihi": {
+              "type": "string",
+              "description": "Değişikliğin geçerli olacağı tarih, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id",
+            "yeni_brut_ucret",
+            "gerekce"
+          ]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Şey, şirkette en çok kim kazanıyor?"
+      },
+      {
+        "role": "assistant",
+        "content": "Bu konuda yardımcı olamıyorum. Çalışanların birbirinin maaş, izin veya iletişim bilgilerine erişimi yoktur."
+      }
+    ]
+  },
+  {
+    "_meta": {
+      "id": "hr_002025",
+      "split": "train",
+      "decision": "cannot_answer",
+      "intent": "historical_bulk_performance_ranking",
+      "domain": "organizasyon",
+      "difficulty": "zor",
+      "register": "resmi",
+      "is_write": false,
+      "confirmation_required": false,
+      "missing_parameters": []
+    },
+    "tools": [
+      {
+        "name": "create_ucret_degisiklik_talebi",
+        "description": "Bir çalışan için ücret değişikliği talebi oluşturur. Değişiklik yaratan hassas bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "yeni_brut_ucret": {
+              "type": "number",
+              "description": "Talep edilen yeni brüt aylık ücret"
+            },
+            "gerekce": {
+              "type": "string",
+              "description": "Ücret değişikliği gerekçesi"
+            },
+            "gecerlilik_tarihi": {
+              "type": "string",
+              "description": "Değişikliğin geçerli olacağı tarih, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id",
+            "yeni_brut_ucret",
+            "gerekce"
+          ]
+        }
+      },
+      {
+        "name": "get_departman_bilgisi",
+        "description": "Bir departmanın özet bilgisini (yönetici, çalışan sayısı, alt ekipler) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "departman_adi": {
+              "type": "string",
+              "description": "Departmanın adı, örn. 'Yazılım Geliştirme'"
+            }
+          },
+          "required": [
+            "departman_adi"
+          ]
+        }
+      },
+      {
+        "name": "get_employee_info",
+        "description": "Bir çalışanın temel kayıt bilgilerini (ad, departman, pozisyon, işe giriş tarihi, yöneticisi) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_calisan_listesi",
+        "description": "Bir departmandaki çalışanların listesini getirir; duruma göre filtrelenebilir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "departman_adi": {
+              "type": "string",
+              "description": "Departmanın adı"
+            },
+            "durum": {
+              "type": "string",
+              "description": "Çalışma durumu filtresi",
+              "enum": [
+                "aktif",
+                "izinli",
+                "ayrildi"
+              ]
+            }
+          },
+          "required": [
+            "departman_adi"
+          ]
+        }
+      },
+      {
+        "name": "get_yonetici_bilgisi",
+        "description": "Bir çalışanın bağlı olduğu yöneticinin bilgisini getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "create_pozisyon_degisiklik_talebi",
+        "description": "Bir çalışan için pozisyon / unvan değişikliği talebi oluşturur. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "yeni_pozisyon": {
+              "type": "string",
+              "description": "Talep edilen yeni pozisyon / unvan"
+            },
+            "gerekce": {
+              "type": "string",
+              "description": "İsteğe bağlı gerekçe"
+            },
+            "gecerlilik_tarihi": {
+              "type": "string",
+              "description": "Geçerlilik tarihi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id",
+            "yeni_pozisyon"
+          ]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Konu: bilgi talebi. 2012 yılında bu şirkette çalışan herkesin performansını sırala. Bilgilerinize arz ederim."
+      },
+      {
+        "role": "assistant",
+        "content": "Bu konuda yardımcı olamıyorum. Bu işlem için tanımlı bir Büyük İK aracı bulunmuyor."
+      },
+      {
+        "role": "user",
+        "content": "Yine de bir fikir ver."
+      },
+      {
+        "role": "assistant",
+        "content": "Bu konuda bir adım atamıyorum. Dilerseniz bunu İK ekibinize iletmenizi öneririm."
+      }
+    ]
+  },
+  {
+    "_meta": {
+      "id": "hr_001910",
+      "split": "train",
+      "decision": "cannot_answer",
+      "intent": "predict_economic_growth",
+      "domain": "kapsanmayan",
+      "difficulty": "orta",
+      "register": "gundelik",
+      "is_write": false,
+      "confirmation_required": false,
+      "missing_parameters": []
+    },
+    "tools": [
+      {
+        "name": "get_izin_gecmisi",
+        "description": "Bir çalışanın geçmişte KULLANDIĞI izin kayıtlarını (tarih, tür, gün sayısı) listeler. Tarih aralığı verilmezse son 12 ayı döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "baslangic_tarihi": {
+              "type": "string",
+              "description": "Aralık başlangıcı, YYYY-AA-GG"
+            },
+            "bitis_tarihi": {
+              "type": "string",
+              "description": "Aralık bitişi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "update_izin_talebi",
+        "description": "Mevcut bir izin talebinin tarihlerini günceller. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "talep_id": {
+              "type": "string",
+              "description": "Güncellenecek izin talebinin kimliği"
+            },
+            "yeni_baslangic_tarihi": {
+              "type": "string",
+              "description": "Yeni başlangıç tarihi, YYYY-AA-GG"
+            },
+            "yeni_bitis_tarihi": {
+              "type": "string",
+              "description": "Yeni bitiş tarihi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "talep_id"
+          ]
+        }
+      },
+      {
+        "name": "get_izin_bakiyesi",
+        "description": "Bir çalışanın izin türüne göre KALAN (kullanılabilir) izin bakiyesini getirir. İzin türü verilmezse tüm türlerin özetini döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "izin_tipi": {
+              "type": "string",
+              "description": "Sorgulanacak izin türü",
+              "enum": [
+                "yillik",
+                "mazeret",
+                "hastalik"
+              ]
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "check_employee_access",
+        "description": "Bir talep edenin, başka bir çalışanın belirli bir kaynağına (maaş, izin, iletişim, bordro, performans) erişim yetkisi olup olmadığını kontrol eder.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "requester_id": {
+              "type": "string",
+              "description": "Talep eden çalışanın personel kimliği"
+            },
+            "hedef_employee_id": {
+              "type": "string",
+              "description": "Erişilmek istenen çalışanın personel kimliği"
+            },
+            "kaynak_tipi": {
+              "type": "string",
+              "description": "Erişilmek istenen kaynak türü",
+              "enum": [
+                "maas",
+                "izin",
+                "iletisim",
+                "bordro",
+                "performans"
+              ]
+            }
+          },
+          "required": [
+            "requester_id",
+            "hedef_employee_id",
+            "kaynak_tipi"
+          ]
+        }
+      },
+      {
+        "name": "update_employee_contact",
+        "description": "Bir çalışanın iletişim bilgilerini (telefon, e-posta, adres) günceller. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "telefon": {
+              "type": "string",
+              "description": "Yeni telefon numarası"
+            },
+            "email": {
+              "type": "string",
+              "description": "Yeni e-posta adresi"
+            },
+            "adres": {
+              "type": "string",
+              "description": "Yeni ikamet adresi"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_puantaj",
+        "description": "Bir çalışanın belirli bir tarih aralığındaki puantaj kaydını (çalışılan gün, giriş/çıkış, devamsızlık) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "baslangic_tarihi": {
+              "type": "string",
+              "description": "Aralık başlangıcı, YYYY-AA-GG"
+            },
+            "bitis_tarihi": {
+              "type": "string",
+              "description": "Aralık bitişi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id",
+            "baslangic_tarihi",
+            "bitis_tarihi"
+          ]
+        }
+      },
+      {
+        "name": "get_employee_info",
+        "description": "Bir çalışanın temel kayıt bilgilerini (ad, departman, pozisyon, işe giriş tarihi, yöneticisi) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "gelecek yil turkiye ekonomisi nasil olacak"
+      },
+      {
+        "role": "assistant",
+        "content": "Kusura bakmayın ama bu geleceğe dönük ve doğrulanamaz bir bilgi; Büyük İK araçları böyle bir tahmin üretmiyor."
+      }
+    ]
+  },
+  {
+    "_meta": {
+      "id": "hr_000311",
+      "split": "train",
+      "decision": "cannot_answer",
+      "intent": "predict_future_overtime",
+      "domain": "puantaj",
+      "difficulty": "zor",
+      "register": "uzun",
+      "is_write": false,
+      "confirmation_required": false,
+      "missing_parameters": []
+    },
+    "tools": [
+      {
+        "name": "get_mesai_bilgisi",
+        "description": "Bir çalışanın belirli bir aya ait fazla mesai (ek çalışma) saatlerini ve karşılığını getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "donem": {
+              "type": "string",
+              "description": "Dönem, YYYY-AA biçiminde"
+            }
+          },
+          "required": [
+            "employee_id",
+            "donem"
+          ]
+        }
+      },
+      {
+        "name": "get_prim_bilgisi",
+        "description": "Bir çalışanın prim / bonus ödemelerini getirir. Dönem verilmezse yürürlükteki yılı döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "donem": {
+              "type": "string",
+              "description": "Prim dönemi, YYYY veya YYYY-AA biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_izin_gecmisi",
+        "description": "Bir çalışanın geçmişte KULLANDIĞI izin kayıtlarını (tarih, tür, gün sayısı) listeler. Tarih aralığı verilmezse son 12 ayı döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "baslangic_tarihi": {
+              "type": "string",
+              "description": "Aralık başlangıcı, YYYY-AA-GG"
+            },
+            "bitis_tarihi": {
+              "type": "string",
+              "description": "Aralık bitişi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_bordro",
+        "description": "Bir çalışanın belirli bir aya ait bordro (maaş pusulası) dökümünü getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "donem": {
+              "type": "string",
+              "description": "Bordro dönemi, YYYY-AA biçiminde"
+            }
+          },
+          "required": [
+            "employee_id",
+            "donem"
+          ]
+        }
+      },
+      {
+        "name": "get_izin_talebi_durumu",
+        "description": "Bir çalışanın izin taleplerinin onay durumunu (beklemede, onaylandı, reddedildi) getirir. talep_id verilmezse en son talebi döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "talep_id": {
+              "type": "string",
+              "description": "İzin talebinin kimliği, 'LV-2026-0001' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_puantaj",
+        "description": "Bir çalışanın belirli bir tarih aralığındaki puantaj kaydını (çalışılan gün, giriş/çıkış, devamsızlık) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "baslangic_tarihi": {
+              "type": "string",
+              "description": "Aralık başlangıcı, YYYY-AA-GG"
+            },
+            "bitis_tarihi": {
+              "type": "string",
+              "description": "Aralık bitişi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id",
+            "baslangic_tarihi",
+            "bitis_tarihi"
+          ]
+        }
+      },
+      {
+        "name": "get_employee_status",
+        "description": "Bir çalışanın güncel çalışma durumunu (aktif, izinli, ücretsiz izinde, ayrıldı) döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_employee_info",
+        "description": "Bir çalışanın temel kayıt bilgilerini (ad, departman, pozisyon, işe giriş tarihi, yöneticisi) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Bu ay birkaç işi toparlamaya çalışıyorum. Seneye toplam kaç saat fazla mesai birikeceğini hesapla. Detayları paylaşabilirsen sevinirim."
+      },
+      {
+        "role": "assistant",
+        "content": "Bu konuda yardımcı olamıyorum. Bu tür bir tahmin spekülasyon olur ve yanlış yönlendirmemek için bunu yapmıyorum. Dilerseniz mevcut kayıtlara bakabilirim."
+      }
+    ]
+  },
+  {
+    "_meta": {
+      "id": "hr_000396",
+      "split": "train",
+      "decision": "cannot_answer",
+      "intent": "predict_layoffs",
+      "domain": "organizasyon",
+      "difficulty": "orta",
+      "register": "resmi",
+      "is_write": false,
+      "confirmation_required": false,
+      "missing_parameters": []
+    },
+    "tools": [
+      {
+        "name": "get_yonetici_bilgisi",
+        "description": "Bir çalışanın bağlı olduğu yöneticinin bilgisini getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "create_pozisyon_degisiklik_talebi",
+        "description": "Bir çalışan için pozisyon / unvan değişikliği talebi oluşturur. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "yeni_pozisyon": {
+              "type": "string",
+              "description": "Talep edilen yeni pozisyon / unvan"
+            },
+            "gerekce": {
+              "type": "string",
+              "description": "İsteğe bağlı gerekçe"
+            },
+            "gecerlilik_tarihi": {
+              "type": "string",
+              "description": "Geçerlilik tarihi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id",
+            "yeni_pozisyon"
+          ]
+        }
+      },
+      {
+        "name": "get_employee_status",
+        "description": "Bir çalışanın güncel çalışma durumunu (aktif, izinli, ücretsiz izinde, ayrıldı) döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_departman_bilgisi",
+        "description": "Bir departmanın özet bilgisini (yönetici, çalışan sayısı, alt ekipler) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "departman_adi": {
+              "type": "string",
+              "description": "Departmanın adı, örn. 'Yazılım Geliştirme'"
+            }
+          },
+          "required": [
+            "departman_adi"
+          ]
+        }
+      },
+      {
+        "name": "get_calisan_listesi",
+        "description": "Bir departmandaki çalışanların listesini getirir; duruma göre filtrelenebilir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "departman_adi": {
+              "type": "string",
+              "description": "Departmanın adı"
+            },
+            "durum": {
+              "type": "string",
+              "description": "Çalışma durumu filtresi",
+              "enum": [
+                "aktif",
+                "izinli",
+                "ayrildi"
+              ]
+            }
+          },
+          "required": [
+            "departman_adi"
+          ]
+        }
+      },
+      {
+        "name": "get_employee_info",
+        "description": "Bir çalışanın temel kayıt bilgilerini (ad, departman, pozisyon, işe giriş tarihi, yöneticisi) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "İlgili birime iletilmek üzere: küçülme olursa hangi departmandan kimler gider. Gereğini rica ederim."
+      },
+      {
+        "role": "assistant",
+        "content": "Ne yazık ki bu tür bir tahmin spekülasyon olur ve yanlış yönlendirmemek için bunu yapmıyorum."
+      }
+    ]
+  },
+  {
+    "_meta": {
+      "id": "hr_002215",
+      "split": "train",
+      "decision": "cannot_answer",
+      "intent": "union_negotiation_details",
+      "domain": "kapsanmayan",
+      "difficulty": "orta",
+      "register": "uzun",
+      "is_write": false,
+      "confirmation_required": false,
+      "missing_parameters": []
+    },
+    "tools": [
+      {
+        "name": "update_employee_information",
+        "description": "Bir çalışanın özlük kayıt bilgilerini (medeni durum, öğrenim durumu, acil durum kişisi) günceller. İletişim bilgileri için update_employee_contact kullanılır. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "medeni_durum": {
+              "type": "string",
+              "description": "Yeni medeni durum",
+              "enum": [
+                "bekar",
+                "evli",
+                "bosanmis",
+                "dul"
+              ]
+            },
+            "ogrenim_durumu": {
+              "type": "string",
+              "description": "Yeni öğrenim durumu",
+              "enum": [
+                "lise",
+                "onlisans",
+                "lisans",
+                "yuksek_lisans",
+                "doktora"
+              ]
+            },
+            "acil_durum_kisisi": {
+              "type": "string",
+              "description": "Acil durumda aranacak kişinin adı"
+            },
+            "acil_durum_telefonu": {
+              "type": "string",
+              "description": "Acil durumda aranacak telefon numarası"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_prim_bilgisi",
+        "description": "Bir çalışanın prim / bonus ödemelerini getirir. Dönem verilmezse yürürlükteki yılı döndürür.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "donem": {
+              "type": "string",
+              "description": "Prim dönemi, YYYY veya YYYY-AA biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_mesai_bilgisi",
+        "description": "Bir çalışanın belirli bir aya ait fazla mesai (ek çalışma) saatlerini ve karşılığını getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "donem": {
+              "type": "string",
+              "description": "Dönem, YYYY-AA biçiminde"
+            }
+          },
+          "required": [
+            "employee_id",
+            "donem"
+          ]
+        }
+      },
+      {
+        "name": "check_employee_access",
+        "description": "Bir talep edenin, başka bir çalışanın belirli bir kaynağına (maaş, izin, iletişim, bordro, performans) erişim yetkisi olup olmadığını kontrol eder.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "requester_id": {
+              "type": "string",
+              "description": "Talep eden çalışanın personel kimliği"
+            },
+            "hedef_employee_id": {
+              "type": "string",
+              "description": "Erişilmek istenen çalışanın personel kimliği"
+            },
+            "kaynak_tipi": {
+              "type": "string",
+              "description": "Erişilmek istenen kaynak türü",
+              "enum": [
+                "maas",
+                "izin",
+                "iletisim",
+                "bordro",
+                "performans"
+              ]
+            }
+          },
+          "required": [
+            "requester_id",
+            "hedef_employee_id",
+            "kaynak_tipi"
+          ]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Bir toplantıya gireceğim, öncesinde şunu teyit etmem lazım. Sendika görüşmelerinde bu yıl ne konuşuldu? Mümkünse bugün kapatmak istiyorum bu işi."
+      },
+      {
+        "role": "assistant",
+        "content": "Üzgünüm, elimdeki araçlar yalnızca İK kayıtlarını sorgulayabiliyor, bu bunlardan biri değil."
+      }
+    ]
+  },
+  {
+    "_meta": {
+      "id": "hr_000448",
+      "split": "train",
+      "decision": "cannot_answer",
+      "intent": "why_coworker_left",
+      "domain": "organizasyon",
+      "difficulty": "zor",
+      "register": "uzun",
+      "is_write": false,
+      "confirmation_required": false,
+      "missing_parameters": []
+    },
+    "tools": [
+      {
+        "name": "create_ucret_degisiklik_talebi",
+        "description": "Bir çalışan için ücret değişikliği talebi oluşturur. Değişiklik yaratan hassas bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "yeni_brut_ucret": {
+              "type": "number",
+              "description": "Talep edilen yeni brüt aylık ücret"
+            },
+            "gerekce": {
+              "type": "string",
+              "description": "Ücret değişikliği gerekçesi"
+            },
+            "gecerlilik_tarihi": {
+              "type": "string",
+              "description": "Değişikliğin geçerli olacağı tarih, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id",
+            "yeni_brut_ucret",
+            "gerekce"
+          ]
+        }
+      },
+      {
+        "name": "get_yonetici_bilgisi",
+        "description": "Bir çalışanın bağlı olduğu yöneticinin bilgisini getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            }
+          },
+          "required": [
+            "employee_id"
+          ]
+        }
+      },
+      {
+        "name": "get_calisan_listesi",
+        "description": "Bir departmandaki çalışanların listesini getirir; duruma göre filtrelenebilir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "departman_adi": {
+              "type": "string",
+              "description": "Departmanın adı"
+            },
+            "durum": {
+              "type": "string",
+              "description": "Çalışma durumu filtresi",
+              "enum": [
+                "aktif",
+                "izinli",
+                "ayrildi"
+              ]
+            }
+          },
+          "required": [
+            "departman_adi"
+          ]
+        }
+      },
+      {
+        "name": "get_departman_bilgisi",
+        "description": "Bir departmanın özet bilgisini (yönetici, çalışan sayısı, alt ekipler) getirir.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "departman_adi": {
+              "type": "string",
+              "description": "Departmanın adı, örn. 'Yazılım Geliştirme'"
+            }
+          },
+          "required": [
+            "departman_adi"
+          ]
+        }
+      },
+      {
+        "name": "create_pozisyon_degisiklik_talebi",
+        "description": "Bir çalışan için pozisyon / unvan değişikliği talebi oluşturur. Değişiklik yaratan bir işlemdir; yürütülmeden önce kullanıcıdan açık onay alınmalıdır.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "employee_id": {
+              "type": "string",
+              "description": "Çalışanın benzersiz personel kimliği, 'EMP-1234' biçiminde"
+            },
+            "yeni_pozisyon": {
+              "type": "string",
+              "description": "Talep edilen yeni pozisyon / unvan"
+            },
+            "gerekce": {
+              "type": "string",
+              "description": "İsteğe bağlı gerekçe"
+            },
+            "gecerlilik_tarihi": {
+              "type": "string",
+              "description": "Geçerlilik tarihi, YYYY-AA-GG"
+            }
+          },
+          "required": [
+            "employee_id",
+            "yeni_pozisyon"
+          ]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Kafam biraz karıştı, yardımcı olabilir misin. O kisi neden kovuldu ic yuzunu anlat. Mümkünse bugün kapatmak istiyorum bu işi."
+      },
+      {
+        "role": "assistant",
+        "content": "Üzgünüm, başka bir çalışanın bu bilgisini paylaşamam; kişisel ve mali veriler yalnızca ilgili kişiye ve yetkili İK ekibine açıktır. Kendi bilgilerinizi sorarsanız yardımcı olabilirim."
+      }
+    ]
+  }
+]

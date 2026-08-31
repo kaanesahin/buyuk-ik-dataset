@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.DS_Store
+.pytest_cache/
+
+# Opsiyonel, yeniden üretilebilir eğitim varyantları
+# (scripts/build_training_variants.py ile oluşturulur)
+data/variants/
