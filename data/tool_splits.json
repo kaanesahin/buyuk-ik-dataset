@@ -1,0 +1,527 @@
+{
+  "hr_get_employee_profile": {
+    "domain": "hr",
+    "cat": "read",
+    "split": "train"
+  },
+  "hr_get_employment_status": {
+    "domain": "hr",
+    "cat": "read",
+    "split": "train"
+  },
+  "hr_get_manager": {
+    "domain": "hr",
+    "cat": "read",
+    "split": "test"
+  },
+  "hr_get_leave_balance": {
+    "domain": "hr",
+    "cat": "read",
+    "split": "val"
+  },
+  "hr_get_leave_history": {
+    "domain": "hr",
+    "cat": "read",
+    "split": "train"
+  },
+  "hr_get_leave_request_status": {
+    "domain": "hr",
+    "cat": "read",
+    "split": "train"
+  },
+  "hr_create_leave_request": {
+    "domain": "hr",
+    "cat": "write",
+    "split": "train"
+  },
+  "hr_cancel_leave_request": {
+    "domain": "hr",
+    "cat": "write",
+    "split": "train"
+  },
+  "hr_update_leave_request": {
+    "domain": "hr",
+    "cat": "write",
+    "split": "test"
+  },
+  "hr_get_org_unit": {
+    "domain": "hr",
+    "cat": "read",
+    "split": "train"
+  },
+  "hr_list_unit_members": {
+    "domain": "hr",
+    "cat": "read",
+    "split": "val"
+  },
+  "payroll_get_salary": {
+    "domain": "payroll",
+    "cat": "read",
+    "split": "train"
+  },
+  "payroll_get_payslip": {
+    "domain": "payroll",
+    "cat": "read",
+    "split": "test"
+  },
+  "payroll_get_bonus": {
+    "domain": "payroll",
+    "cat": "read",
+    "split": "train"
+  },
+  "payroll_get_benefits": {
+    "domain": "payroll",
+    "cat": "read",
+    "split": "train"
+  },
+  "payroll_get_tax_summary": {
+    "domain": "payroll",
+    "cat": "read",
+    "split": "train"
+  },
+  "payroll_create_salary_change_request": {
+    "domain": "payroll",
+    "cat": "write",
+    "split": "train"
+  },
+  "payroll_get_deduction_breakdown": {
+    "domain": "payroll",
+    "cat": "read",
+    "split": "val"
+  },
+  "payroll_get_payment_history": {
+    "domain": "payroll",
+    "cat": "read",
+    "split": "train"
+  },
+  "payroll_get_severance_estimate": {
+    "domain": "payroll",
+    "cat": "read",
+    "split": "train"
+  },
+  "timesheet_get_records": {
+    "domain": "timesheet",
+    "cat": "read",
+    "split": "train"
+  },
+  "timesheet_get_overtime": {
+    "domain": "timesheet",
+    "cat": "read",
+    "split": "train"
+  },
+  "timesheet_submit_time_correction": {
+    "domain": "timesheet",
+    "cat": "write",
+    "split": "test"
+  },
+  "timesheet_get_attendance_summary": {
+    "domain": "timesheet",
+    "cat": "read",
+    "split": "train"
+  },
+  "timesheet_get_shift_schedule": {
+    "domain": "timesheet",
+    "cat": "read",
+    "split": "val"
+  },
+  "timesheet_request_leave_of_absence": {
+    "domain": "timesheet",
+    "cat": "write",
+    "split": "train"
+  },
+  "finance_get_invoice": {
+    "domain": "finance",
+    "cat": "read",
+    "split": "train"
+  },
+  "finance_list_invoices": {
+    "domain": "finance",
+    "cat": "read",
+    "split": "train"
+  },
+  "finance_create_expense_report": {
+    "domain": "finance",
+    "cat": "write",
+    "split": "train"
+  },
+  "finance_get_expense_status": {
+    "domain": "finance",
+    "cat": "read",
+    "split": "train"
+  },
+  "finance_approve_expense": {
+    "domain": "finance",
+    "cat": "action",
+    "split": "train"
+  },
+  "finance_get_budget_status": {
+    "domain": "finance",
+    "cat": "read",
+    "split": "train"
+  },
+  "finance_create_purchase_order": {
+    "domain": "finance",
+    "cat": "write",
+    "split": "test"
+  },
+  "finance_get_vendor": {
+    "domain": "finance",
+    "cat": "read",
+    "split": "train"
+  },
+  "finance_get_reimbursement_policy_limit": {
+    "domain": "finance",
+    "cat": "read",
+    "split": "val"
+  },
+  "crm_get_contact": {
+    "domain": "crm",
+    "cat": "read",
+    "split": "val"
+  },
+  "crm_search_contacts": {
+    "domain": "crm",
+    "cat": "read",
+    "split": "train"
+  },
+  "crm_create_contact": {
+    "domain": "crm",
+    "cat": "write",
+    "split": "train"
+  },
+  "crm_update_contact": {
+    "domain": "crm",
+    "cat": "write",
+    "split": "val"
+  },
+  "crm_get_account": {
+    "domain": "crm",
+    "cat": "read",
+    "split": "train"
+  },
+  "crm_list_account_contacts": {
+    "domain": "crm",
+    "cat": "read",
+    "split": "train"
+  },
+  "crm_log_interaction": {
+    "domain": "crm",
+    "cat": "write",
+    "split": "train"
+  },
+  "crm_get_deal": {
+    "domain": "crm",
+    "cat": "read",
+    "split": "train"
+  },
+  "crm_list_deals": {
+    "domain": "crm",
+    "cat": "read",
+    "split": "train"
+  },
+  "crm_update_deal_stage": {
+    "domain": "crm",
+    "cat": "write",
+    "split": "test"
+  },
+  "crm_get_customer_churn_risk": {
+    "domain": "crm",
+    "cat": "read",
+    "split": "test"
+  },
+  "it_create_ticket": {
+    "domain": "it_support",
+    "cat": "write",
+    "split": "train"
+  },
+  "it_get_ticket": {
+    "domain": "it_support",
+    "cat": "read",
+    "split": "train"
+  },
+  "it_update_ticket": {
+    "domain": "it_support",
+    "cat": "write",
+    "split": "train"
+  },
+  "it_list_my_tickets": {
+    "domain": "it_support",
+    "cat": "read",
+    "split": "val"
+  },
+  "it_reset_password_request": {
+    "domain": "it_support",
+    "cat": "action",
+    "split": "train"
+  },
+  "it_get_asset": {
+    "domain": "it_support",
+    "cat": "read",
+    "split": "test"
+  },
+  "it_assign_asset": {
+    "domain": "it_support",
+    "cat": "write",
+    "split": "train"
+  },
+  "it_check_service_status": {
+    "domain": "it_support",
+    "cat": "read",
+    "split": "train"
+  },
+  "it_grant_access_request": {
+    "domain": "it_support",
+    "cat": "write",
+    "split": "train"
+  },
+  "logistics_get_shipment": {
+    "domain": "logistics",
+    "cat": "read",
+    "split": "train"
+  },
+  "logistics_track_shipment": {
+    "domain": "logistics",
+    "cat": "read",
+    "split": "train"
+  },
+  "logistics_create_shipment": {
+    "domain": "logistics",
+    "cat": "write",
+    "split": "train"
+  },
+  "logistics_list_shipments": {
+    "domain": "logistics",
+    "cat": "read",
+    "split": "train"
+  },
+  "logistics_get_carrier_rate": {
+    "domain": "logistics",
+    "cat": "read",
+    "split": "val"
+  },
+  "logistics_schedule_pickup": {
+    "domain": "logistics",
+    "cat": "write",
+    "split": "test"
+  },
+  "logistics_report_damage": {
+    "domain": "logistics",
+    "cat": "write",
+    "split": "train"
+  },
+  "inventory_get_stock_level": {
+    "domain": "inventory",
+    "cat": "read",
+    "split": "train"
+  },
+  "inventory_list_low_stock": {
+    "domain": "inventory",
+    "cat": "read",
+    "split": "train"
+  },
+  "inventory_create_stock_transfer": {
+    "domain": "inventory",
+    "cat": "write",
+    "split": "test"
+  },
+  "inventory_get_item": {
+    "domain": "inventory",
+    "cat": "read",
+    "split": "train"
+  },
+  "inventory_adjust_stock_count": {
+    "domain": "inventory",
+    "cat": "write",
+    "split": "val"
+  },
+  "inventory_get_warehouse": {
+    "domain": "inventory",
+    "cat": "read",
+    "split": "train"
+  },
+  "inventory_reserve_stock": {
+    "domain": "inventory",
+    "cat": "write",
+    "split": "train"
+  },
+  "sales_get_quote": {
+    "domain": "sales",
+    "cat": "read",
+    "split": "train"
+  },
+  "sales_create_quote": {
+    "domain": "sales",
+    "cat": "write",
+    "split": "train"
+  },
+  "sales_get_order": {
+    "domain": "sales",
+    "cat": "read",
+    "split": "train"
+  },
+  "sales_list_orders": {
+    "domain": "sales",
+    "cat": "read",
+    "split": "train"
+  },
+  "sales_get_order_status": {
+    "domain": "sales",
+    "cat": "read",
+    "split": "val"
+  },
+  "sales_cancel_order": {
+    "domain": "sales",
+    "cat": "write",
+    "split": "test"
+  },
+  "sales_get_pricing": {
+    "domain": "sales",
+    "cat": "read",
+    "split": "train"
+  },
+  "sales_get_target_progress": {
+    "domain": "sales",
+    "cat": "read",
+    "split": "train"
+  },
+  "sales_apply_discount_approval": {
+    "domain": "sales",
+    "cat": "write",
+    "split": "train"
+  },
+  "calendar_get_events": {
+    "domain": "calendar",
+    "cat": "read",
+    "split": "train"
+  },
+  "calendar_create_event": {
+    "domain": "calendar",
+    "cat": "write",
+    "split": "val"
+  },
+  "calendar_cancel_event": {
+    "domain": "calendar",
+    "cat": "write",
+    "split": "train"
+  },
+  "calendar_find_free_slot": {
+    "domain": "calendar",
+    "cat": "read",
+    "split": "train"
+  },
+  "calendar_get_room_availability": {
+    "domain": "calendar",
+    "cat": "read",
+    "split": "train"
+  },
+  "calendar_book_room": {
+    "domain": "calendar",
+    "cat": "write",
+    "split": "train"
+  },
+  "calendar_reschedule_event": {
+    "domain": "calendar",
+    "cat": "write",
+    "split": "test"
+  },
+  "docs_search": {
+    "domain": "documents",
+    "cat": "read",
+    "split": "test"
+  },
+  "docs_get_document": {
+    "domain": "documents",
+    "cat": "read",
+    "split": "train"
+  },
+  "docs_create_document_request": {
+    "domain": "documents",
+    "cat": "write",
+    "split": "val"
+  },
+  "docs_get_request_status": {
+    "domain": "documents",
+    "cat": "read",
+    "split": "train"
+  },
+  "docs_share_document": {
+    "domain": "documents",
+    "cat": "write",
+    "split": "train"
+  },
+  "docs_list_folder": {
+    "domain": "documents",
+    "cat": "read",
+    "split": "train"
+  },
+  "docs_request_signature": {
+    "domain": "documents",
+    "cat": "write",
+    "split": "train"
+  },
+  "reporting_run_report": {
+    "domain": "reporting",
+    "cat": "read",
+    "split": "train"
+  },
+  "reporting_list_reports": {
+    "domain": "reporting",
+    "cat": "read",
+    "split": "train"
+  },
+  "reporting_schedule_report": {
+    "domain": "reporting",
+    "cat": "write",
+    "split": "test"
+  },
+  "reporting_get_report_result": {
+    "domain": "reporting",
+    "cat": "read",
+    "split": "val"
+  },
+  "reporting_export_dataset": {
+    "domain": "reporting",
+    "cat": "action",
+    "split": "train"
+  },
+  "reporting_get_kpi_snapshot": {
+    "domain": "reporting",
+    "cat": "read",
+    "split": "train"
+  },
+  "support_get_customer": {
+    "domain": "support",
+    "cat": "read",
+    "split": "test"
+  },
+  "support_get_customer_health": {
+    "domain": "support",
+    "cat": "read",
+    "split": "train"
+  },
+  "support_list_open_cases": {
+    "domain": "support",
+    "cat": "read",
+    "split": "train"
+  },
+  "support_create_case": {
+    "domain": "support",
+    "cat": "write",
+    "split": "train"
+  },
+  "support_escalate_case": {
+    "domain": "support",
+    "cat": "action",
+    "split": "train"
+  },
+  "support_get_sla_status": {
+    "domain": "support",
+    "cat": "read",
+    "split": "train"
+  },
+  "support_send_customer_update": {
+    "domain": "support",
+    "cat": "write",
+    "split": "val"
+  }
+}

@@ -1,0 +1,1650 @@
+[
+  {
+    "name": "hr_get_employee_profile",
+    "description": "Bir çalışanın temel özlük kaydını (ad, birim, unvan, işe giriş tarihi, yönetici) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        }
+      },
+      "required": [
+        "employee_id"
+      ]
+    }
+  },
+  {
+    "name": "hr_get_employment_status",
+    "description": "Bir çalışanın güncel çalışma durumunu (aktif, izinli, ücretsiz izinde, ayrıldı) döndürür.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        }
+      },
+      "required": [
+        "employee_id"
+      ]
+    }
+  },
+  {
+    "name": "hr_get_leave_history",
+    "description": "Bir çalışanın geçmişte kullandığı izin kayıtlarını tarih aralığına göre listeler.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        },
+        "start_date": {
+          "type": "string",
+          "description": "Aralık başlangıcı, YYYY-AA-GG"
+        },
+        "end_date": {
+          "type": "string",
+          "description": "Aralık bitişi, YYYY-AA-GG"
+        }
+      },
+      "required": [
+        "employee_id"
+      ]
+    }
+  },
+  {
+    "name": "hr_get_leave_request_status",
+    "description": "Bir çalışanın izin talebinin onay durumunu (beklemede, onaylandı, reddedildi) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        },
+        "request_id": {
+          "type": "string",
+          "description": "Talep kimliği, 'LR-1234' biçiminde"
+        }
+      },
+      "required": [
+        "employee_id"
+      ]
+    }
+  },
+  {
+    "name": "hr_create_leave_request",
+    "description": "Bir çalışan için yeni izin talebi oluşturur. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        },
+        "leave_type": {
+          "type": "string",
+          "description": "İzin türü",
+          "enum": [
+            "annual",
+            "excuse",
+            "sick",
+            "unpaid"
+          ]
+        },
+        "start_date": {
+          "type": "string",
+          "description": "Başlangıç, YYYY-AA-GG"
+        },
+        "end_date": {
+          "type": "string",
+          "description": "Bitiş, YYYY-AA-GG"
+        },
+        "note": {
+          "type": "string",
+          "description": "İsteğe bağlı açıklama"
+        }
+      },
+      "required": [
+        "employee_id",
+        "leave_type",
+        "start_date",
+        "end_date"
+      ]
+    }
+  },
+  {
+    "name": "hr_cancel_leave_request",
+    "description": "Mevcut bir izin talebini iptal eder. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "description": "İptal edilecek talebin kimliği"
+        }
+      },
+      "required": [
+        "request_id"
+      ]
+    }
+  },
+  {
+    "name": "hr_get_org_unit",
+    "description": "Bir organizasyon biriminin özetini (yönetici, kişi sayısı, alt ekipler) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "unit_name": {
+          "type": "string",
+          "description": "Birim adı, örn. 'Satış'"
+        }
+      },
+      "required": [
+        "unit_name"
+      ]
+    }
+  },
+  {
+    "name": "payroll_get_salary",
+    "description": "Bir çalışanın güncel maaş bilgisini (net / brüt) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        },
+        "basis": {
+          "type": "string",
+          "description": "Maaş türü",
+          "enum": [
+            "net",
+            "gross"
+          ]
+        }
+      },
+      "required": [
+        "employee_id"
+      ]
+    }
+  },
+  {
+    "name": "payroll_get_bonus",
+    "description": "Bir çalışanın prim / ikramiye ödemelerini yıla göre getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        },
+        "year": {
+          "type": "string",
+          "description": "Yıl"
+        }
+      },
+      "required": [
+        "employee_id"
+      ]
+    }
+  },
+  {
+    "name": "payroll_get_benefits",
+    "description": "Bir çalışanın yan haklarını (özel sağlık, yemek, ulaşım, BES) listeler.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        }
+      },
+      "required": [
+        "employee_id"
+      ]
+    }
+  },
+  {
+    "name": "payroll_get_tax_summary",
+    "description": "Bir çalışanın yıl içi kümülatif gelir vergisi matrahı ve kesinti özetini getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        },
+        "year": {
+          "type": "string",
+          "description": "Yıl"
+        }
+      },
+      "required": [
+        "employee_id"
+      ]
+    }
+  },
+  {
+    "name": "payroll_create_salary_change_request",
+    "description": "Bir çalışan için ücret değişikliği talebi oluşturur. Hassas işlem; onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        },
+        "new_gross_amount": {
+          "type": "number",
+          "description": "Yeni brüt aylık ücret"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Gerekçe"
+        },
+        "effective_date": {
+          "type": "string",
+          "description": "Geçerlilik tarihi"
+        }
+      },
+      "required": [
+        "employee_id",
+        "new_gross_amount",
+        "reason"
+      ]
+    }
+  },
+  {
+    "name": "payroll_get_payment_history",
+    "description": "Bir çalışana yapılan maaş ödemelerinin geçmişini tarih aralığına göre listeler.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        },
+        "start_date": {
+          "type": "string",
+          "description": "Başlangıç"
+        },
+        "end_date": {
+          "type": "string",
+          "description": "Bitiş"
+        }
+      },
+      "required": [
+        "employee_id"
+      ]
+    }
+  },
+  {
+    "name": "payroll_get_severance_estimate",
+    "description": "Bir çalışan için tahmini kıdem ve ihbar tutarını hesaplar.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        },
+        "termination_date": {
+          "type": "string",
+          "description": "Çıkış tarihi"
+        }
+      },
+      "required": [
+        "employee_id"
+      ]
+    }
+  },
+  {
+    "name": "timesheet_get_records",
+    "description": "Bir çalışanın tarih aralığındaki puantaj kaydını (çalışılan gün, giriş/çıkış, devamsızlık) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        },
+        "start_date": {
+          "type": "string",
+          "description": "Başlangıç"
+        },
+        "end_date": {
+          "type": "string",
+          "description": "Bitiş"
+        }
+      },
+      "required": [
+        "employee_id",
+        "start_date",
+        "end_date"
+      ]
+    }
+  },
+  {
+    "name": "timesheet_get_overtime",
+    "description": "Bir çalışanın belirli bir aya ait fazla mesai saatlerini ve karşılığını getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        },
+        "period": {
+          "type": "string",
+          "description": "Dönem, YYYY-AA"
+        }
+      },
+      "required": [
+        "employee_id",
+        "period"
+      ]
+    }
+  },
+  {
+    "name": "timesheet_get_attendance_summary",
+    "description": "Bir birim veya çalışan için dönemsel devam-devamsızlık özetini getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "scope_id": {
+          "type": "string",
+          "description": "Çalışan veya birim kimliği"
+        },
+        "period": {
+          "type": "string",
+          "description": "Dönem"
+        }
+      },
+      "required": [
+        "scope_id",
+        "period"
+      ]
+    }
+  },
+  {
+    "name": "timesheet_request_leave_of_absence",
+    "description": "Uzun süreli ücretsiz devamsızlık (izinsiz ayrılış değil) talebi oluşturur. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        },
+        "start_date": {
+          "type": "string",
+          "description": "Başlangıç"
+        },
+        "duration_days": {
+          "type": "number",
+          "description": "Süre (gün)"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Gerekçe"
+        }
+      },
+      "required": [
+        "employee_id",
+        "start_date",
+        "duration_days",
+        "reason"
+      ]
+    }
+  },
+  {
+    "name": "finance_get_invoice",
+    "description": "Bir faturanın ayrıntılarını (tutar, tarih, tedarikçi, durum) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "invoice_id": {
+          "type": "string",
+          "description": "Fatura kimliği, 'INV-1234' biçiminde"
+        }
+      },
+      "required": [
+        "invoice_id"
+      ]
+    }
+  },
+  {
+    "name": "finance_list_invoices",
+    "description": "Bir tedarikçi veya döneme ait faturaları listeler.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "vendor_id": {
+          "type": "string",
+          "description": "Tedarikçi kimliği"
+        },
+        "period": {
+          "type": "string",
+          "description": "Dönem"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "finance_create_expense_report",
+    "description": "Bir çalışan için masraf beyanı oluşturur. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Toplam tutar"
+        },
+        "category": {
+          "type": "string",
+          "description": "Masraf türü",
+          "enum": [
+            "travel",
+            "meal",
+            "supplies",
+            "other"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Açıklama"
+        }
+      },
+      "required": [
+        "employee_id",
+        "amount",
+        "category"
+      ]
+    }
+  },
+  {
+    "name": "finance_get_expense_status",
+    "description": "Bir masraf beyanının onay ve ödeme durumunu getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "report_id": {
+          "type": "string",
+          "description": "Masraf beyanı kimliği, 'EXP-1234' biçiminde"
+        }
+      },
+      "required": [
+        "report_id"
+      ]
+    }
+  },
+  {
+    "name": "finance_approve_expense",
+    "description": "Bir masraf beyanını onaylar. Yalnız yetkili yönetici çağırabilir; onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "report_id": {
+          "type": "string",
+          "description": "Masraf beyanı kimliği, 'EXP-1234' biçiminde"
+        },
+        "approver_id": {
+          "type": "string",
+          "description": "Onaylayan yöneticinin personel kimliği"
+        }
+      },
+      "required": [
+        "report_id",
+        "approver_id"
+      ]
+    }
+  },
+  {
+    "name": "finance_get_budget_status",
+    "description": "Bir bütçe kaleminin kullanım ve kalan durumunu getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "budget_code": {
+          "type": "string",
+          "description": "Bütçe kodu"
+        },
+        "year": {
+          "type": "string",
+          "description": "Yıl"
+        }
+      },
+      "required": [
+        "budget_code"
+      ]
+    }
+  },
+  {
+    "name": "finance_get_vendor",
+    "description": "Bir tedarikçinin kayıt bilgilerini (ad, vergi no, ödeme koşulu, iletişim) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "vendor_id": {
+          "type": "string",
+          "description": "Tedarikçi kimliği"
+        }
+      },
+      "required": [
+        "vendor_id"
+      ]
+    }
+  },
+  {
+    "name": "crm_search_contacts",
+    "description": "İsim, e-posta veya şirkete göre kişi kayıtlarını arar.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Aranacak isim / e-posta / şirket"
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  {
+    "name": "crm_create_contact",
+    "description": "Yeni bir kişi kaydı oluşturur. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Kişinin adı"
+        },
+        "account_id": {
+          "type": "string",
+          "description": "Bağlı hesap kimliği"
+        },
+        "email": {
+          "type": "string",
+          "description": "E-posta"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Telefon"
+        }
+      },
+      "required": [
+        "name",
+        "account_id"
+      ]
+    }
+  },
+  {
+    "name": "crm_get_account",
+    "description": "Bir müşteri hesabının özetini (sektör, büyüklük, sorumlu, açık fırsat) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "type": "string",
+          "description": "Hesap kimliği, 'ACC-1234' biçiminde"
+        }
+      },
+      "required": [
+        "account_id"
+      ]
+    }
+  },
+  {
+    "name": "crm_list_account_contacts",
+    "description": "Bir hesaba bağlı tüm kişi kayıtlarını listeler.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "type": "string",
+          "description": "Hesap kimliği, 'ACC-1234' biçiminde"
+        }
+      },
+      "required": [
+        "account_id"
+      ]
+    }
+  },
+  {
+    "name": "crm_log_interaction",
+    "description": "Bir kişiyle yapılan görüşmeyi (arama, toplantı, e-posta) kayıt altına alır. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "contact_id": {
+          "type": "string",
+          "description": "Kişi kimliği, 'CNT-1234' biçiminde"
+        },
+        "channel": {
+          "type": "string",
+          "description": "Kanal",
+          "enum": [
+            "call",
+            "meeting",
+            "email"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "description": "Görüşme özeti"
+        },
+        "date": {
+          "type": "string",
+          "description": "Görüşme tarihi"
+        }
+      },
+      "required": [
+        "contact_id",
+        "channel",
+        "summary"
+      ]
+    }
+  },
+  {
+    "name": "crm_get_deal",
+    "description": "Bir satış fırsatının ayrıntılarını (tutar, aşama, kapanış tahmini, sorumlu) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "deal_id": {
+          "type": "string",
+          "description": "Fırsat kimliği, 'DEA-1234' biçiminde"
+        }
+      },
+      "required": [
+        "deal_id"
+      ]
+    }
+  },
+  {
+    "name": "crm_list_deals",
+    "description": "Bir hesap, sorumlu veya aşamaya göre satış fırsatlarını listeler.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "type": "string",
+          "description": "Hesap kimliği"
+        },
+        "stage": {
+          "type": "string",
+          "description": "Aşama filtresi",
+          "enum": [
+            "lead",
+            "qualified",
+            "proposal",
+            "negotiation",
+            "won",
+            "lost"
+          ]
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "it_create_ticket",
+    "description": "Bir BT destek talebi (arıza / istek) oluşturur.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "reporter_id": {
+          "type": "string",
+          "description": "Talebi açan personel kimliği"
+        },
+        "category": {
+          "type": "string",
+          "description": "Talep türü",
+          "enum": [
+            "hardware",
+            "software",
+            "access",
+            "network"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "description": "Sorun özeti"
+        },
+        "priority": {
+          "type": "string",
+          "description": "Öncelik",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "urgent"
+          ]
+        }
+      },
+      "required": [
+        "reporter_id",
+        "category",
+        "summary"
+      ]
+    }
+  },
+  {
+    "name": "it_get_ticket",
+    "description": "Bir BT destek talebinin durumunu ve atanan kişiyi getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ticket_id": {
+          "type": "string",
+          "description": "Destek talebi kimliği, 'TIC-1234' biçiminde"
+        }
+      },
+      "required": [
+        "ticket_id"
+      ]
+    }
+  },
+  {
+    "name": "it_update_ticket",
+    "description": "Bir BT talebine not ekler veya durumunu günceller. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "ticket_id": {
+          "type": "string",
+          "description": "Destek talebi kimliği, 'TIC-1234' biçiminde"
+        },
+        "status": {
+          "type": "string",
+          "description": "Yeni durum",
+          "enum": [
+            "open",
+            "in_progress",
+            "resolved",
+            "closed"
+          ]
+        },
+        "note": {
+          "type": "string",
+          "description": "Eklenecek not"
+        }
+      },
+      "required": [
+        "ticket_id"
+      ]
+    }
+  },
+  {
+    "name": "it_reset_password_request",
+    "description": "Bir çalışan için parola sıfırlama talebi başlatır (kendi hesabı için).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Kendi personel kimliğiniz"
+        },
+        "system": {
+          "type": "string",
+          "description": "Hangi sistem",
+          "enum": [
+            "email",
+            "vpn",
+            "portal",
+            "erp"
+          ]
+        }
+      },
+      "required": [
+        "employee_id",
+        "system"
+      ]
+    }
+  },
+  {
+    "name": "it_assign_asset",
+    "description": "Bir zimmet varlığını bir çalışana atar. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "asset_id": {
+          "type": "string",
+          "description": "Varlık kimliği, 'AST-1234' biçiminde"
+        },
+        "employee_id": {
+          "type": "string",
+          "description": "Zimmetlenecek personel kimliği"
+        }
+      },
+      "required": [
+        "asset_id",
+        "employee_id"
+      ]
+    }
+  },
+  {
+    "name": "it_check_service_status",
+    "description": "Bir kurumsal servisin (e-posta, VPN, ERP) güncel çalışma durumunu getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "service": {
+          "type": "string",
+          "description": "Servis",
+          "enum": [
+            "email",
+            "vpn",
+            "erp",
+            "portal",
+            "wifi"
+          ]
+        }
+      },
+      "required": [
+        "service"
+      ]
+    }
+  },
+  {
+    "name": "it_grant_access_request",
+    "description": "Bir çalışan için bir uygulamaya erişim yetkisi talebi oluşturur. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği"
+        },
+        "application": {
+          "type": "string",
+          "description": "Uygulama adı"
+        },
+        "access_level": {
+          "type": "string",
+          "description": "Yetki düzeyi",
+          "enum": [
+            "read",
+            "write",
+            "admin"
+          ]
+        }
+      },
+      "required": [
+        "employee_id",
+        "application"
+      ]
+    }
+  },
+  {
+    "name": "logistics_get_shipment",
+    "description": "Bir sevkiyatın ayrıntılarını (içerik, çıkış/varış, taşıyıcı, durum) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "shipment_id": {
+          "type": "string",
+          "description": "Sevkiyat kimliği, 'SHP-1234' biçiminde"
+        }
+      },
+      "required": [
+        "shipment_id"
+      ]
+    }
+  },
+  {
+    "name": "logistics_track_shipment",
+    "description": "Bir sevkiyatın güncel konum ve teslim tahminini getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "shipment_id": {
+          "type": "string",
+          "description": "Sevkiyat kimliği, 'SHP-1234' biçiminde"
+        }
+      },
+      "required": [
+        "shipment_id"
+      ]
+    }
+  },
+  {
+    "name": "logistics_create_shipment",
+    "description": "Yeni bir sevkiyat kaydı oluşturur. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "origin": {
+          "type": "string",
+          "description": "Çıkış noktası (şehir/depo)"
+        },
+        "destination": {
+          "type": "string",
+          "description": "Varış noktası"
+        },
+        "weight_kg": {
+          "type": "string",
+          "description": "Ağırlık (kg)"
+        },
+        "ship_date": {
+          "type": "string",
+          "description": "Sevk tarihi"
+        }
+      },
+      "required": [
+        "origin",
+        "destination",
+        "weight_kg"
+      ]
+    }
+  },
+  {
+    "name": "logistics_list_shipments",
+    "description": "Bir tarih aralığı veya duruma göre sevkiyatları listeler.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "start_date": {
+          "type": "string",
+          "description": "Başlangıç"
+        },
+        "end_date": {
+          "type": "string",
+          "description": "Bitiş"
+        },
+        "status": {
+          "type": "string",
+          "description": "Durum",
+          "enum": [
+            "pending",
+            "in_transit",
+            "delivered",
+            "delayed"
+          ]
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "logistics_report_damage",
+    "description": "Bir sevkiyat için hasar/eksik bildirimi oluşturur. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "shipment_id": {
+          "type": "string",
+          "description": "Sevkiyat kimliği, 'SHP-1234' biçiminde"
+        },
+        "description": {
+          "type": "string",
+          "description": "Hasar açıklaması"
+        }
+      },
+      "required": [
+        "shipment_id",
+        "description"
+      ]
+    }
+  },
+  {
+    "name": "inventory_get_stock_level",
+    "description": "Bir ürünün belirli bir depodaki güncel stok miktarını getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "description": "Ürün kimliği, 'ITM-1234' biçiminde"
+        },
+        "warehouse_id": {
+          "type": "string",
+          "description": "Depo kimliği"
+        }
+      },
+      "required": [
+        "item_id"
+      ]
+    }
+  },
+  {
+    "name": "inventory_list_low_stock",
+    "description": "Yeniden sipariş eşiğinin altına düşen ürünleri listeler.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "warehouse_id": {
+          "type": "string",
+          "description": "Depo kimliği"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "inventory_get_item",
+    "description": "Bir ürünün kayıt bilgilerini (ad, kategori, birim, tedarikçi, fiyat) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "description": "Ürün kimliği, 'ITM-1234' biçiminde"
+        }
+      },
+      "required": [
+        "item_id"
+      ]
+    }
+  },
+  {
+    "name": "inventory_get_warehouse",
+    "description": "Bir deponun bilgilerini (konum, kapasite, sorumlu, doluluk) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "warehouse_id": {
+          "type": "string",
+          "description": "Depo kimliği"
+        }
+      },
+      "required": [
+        "warehouse_id"
+      ]
+    }
+  },
+  {
+    "name": "inventory_reserve_stock",
+    "description": "Bir sipariş için stok rezervasyonu oluşturur. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "description": "Ürün kimliği, 'ITM-1234' biçiminde"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Miktar"
+        },
+        "order_id": {
+          "type": "string",
+          "description": "Sipariş kimliği"
+        }
+      },
+      "required": [
+        "item_id",
+        "quantity",
+        "order_id"
+      ]
+    }
+  },
+  {
+    "name": "sales_get_quote",
+    "description": "Bir satış teklifinin ayrıntılarını (kalemler, tutar, geçerlilik, durum) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "quote_id": {
+          "type": "string",
+          "description": "Teklif kimliği, 'QTE-1234' biçiminde"
+        }
+      },
+      "required": [
+        "quote_id"
+      ]
+    }
+  },
+  {
+    "name": "sales_create_quote",
+    "description": "Bir müşteri için yeni satış teklifi oluşturur. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "type": "string",
+          "description": "Hesap kimliği, 'ACC-1234' biçiminde"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Teklif tutarı"
+        },
+        "valid_days": {
+          "type": "number",
+          "description": "Geçerlilik süresi (gün)"
+        }
+      },
+      "required": [
+        "account_id",
+        "amount"
+      ]
+    }
+  },
+  {
+    "name": "sales_get_order",
+    "description": "Bir satış siparişinin ayrıntılarını (kalemler, tutar, teslim, durum) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "order_id": {
+          "type": "string",
+          "description": "Sipariş kimliği, 'ORD-1234' biçiminde"
+        }
+      },
+      "required": [
+        "order_id"
+      ]
+    }
+  },
+  {
+    "name": "sales_list_orders",
+    "description": "Bir müşteri, tarih aralığı veya duruma göre siparişleri listeler.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "type": "string",
+          "description": "Hesap kimliği"
+        },
+        "start_date": {
+          "type": "string",
+          "description": "Başlangıç"
+        },
+        "end_date": {
+          "type": "string",
+          "description": "Bitiş"
+        },
+        "status": {
+          "type": "string",
+          "description": "Durum",
+          "enum": [
+            "open",
+            "shipped",
+            "delivered",
+            "cancelled"
+          ]
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "sales_get_pricing",
+    "description": "Bir ürün ve müşteri segmenti için güncel liste/indirimli fiyatı getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "description": "Ürün kimliği, 'ITM-1234' biçiminde"
+        },
+        "segment": {
+          "type": "string",
+          "description": "Müşteri segmenti",
+          "enum": [
+            "retail",
+            "wholesale",
+            "key_account"
+          ]
+        }
+      },
+      "required": [
+        "item_id"
+      ]
+    }
+  },
+  {
+    "name": "sales_get_target_progress",
+    "description": "Bir satış temsilcisinin dönem hedefine göre gerçekleşme durumunu getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "rep_id": {
+          "type": "string",
+          "description": "Temsilci personel kimliği"
+        },
+        "period": {
+          "type": "string",
+          "description": "Dönem"
+        }
+      },
+      "required": [
+        "rep_id"
+      ]
+    }
+  },
+  {
+    "name": "sales_apply_discount_approval",
+    "description": "Liste dışı bir indirim için onay talebi oluşturur. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "quote_id": {
+          "type": "string",
+          "description": "Teklif kimliği, 'QTE-1234' biçiminde"
+        },
+        "discount": {
+          "type": "number",
+          "description": "İstenen indirim oranı"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Gerekçe"
+        }
+      },
+      "required": [
+        "quote_id",
+        "discount",
+        "reason"
+      ]
+    }
+  },
+  {
+    "name": "calendar_get_events",
+    "description": "Bir kişinin belirli bir gün/aralıktaki takvim etkinliklerini listeler.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği"
+        },
+        "date": {
+          "type": "string",
+          "description": "Gün"
+        }
+      },
+      "required": [
+        "employee_id",
+        "date"
+      ]
+    }
+  },
+  {
+    "name": "calendar_cancel_event",
+    "description": "Bir takvim etkinliğini iptal eder ve katılımcıları bilgilendirir. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "description": "Etkinlik kimliği, 'EVT-1234' biçiminde"
+        }
+      },
+      "required": [
+        "event_id"
+      ]
+    }
+  },
+  {
+    "name": "calendar_find_free_slot",
+    "description": "İki veya daha çok kişinin ortak boş zamanını belirli bir aralıkta bulur.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Birinci kişi"
+        },
+        "other_id": {
+          "type": "string",
+          "description": "İkinci kişi"
+        },
+        "date": {
+          "type": "string",
+          "description": "Aranacak gün"
+        }
+      },
+      "required": [
+        "employee_id",
+        "other_id",
+        "date"
+      ]
+    }
+  },
+  {
+    "name": "calendar_get_room_availability",
+    "description": "Bir toplantı odasının belirli bir gün/saatteki doluluk durumunu getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "room_id": {
+          "type": "string",
+          "description": "Oda kimliği"
+        },
+        "date": {
+          "type": "string",
+          "description": "Gün"
+        }
+      },
+      "required": [
+        "room_id",
+        "date"
+      ]
+    }
+  },
+  {
+    "name": "calendar_book_room",
+    "description": "Bir toplantı odasını belirli bir zaman aralığı için rezerve eder. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "room_id": {
+          "type": "string",
+          "description": "Oda kimliği"
+        },
+        "start": {
+          "type": "string",
+          "description": "Başlangıç"
+        },
+        "duration_min": {
+          "type": "string",
+          "description": "Süre (dakika)"
+        }
+      },
+      "required": [
+        "room_id",
+        "start",
+        "duration_min"
+      ]
+    }
+  },
+  {
+    "name": "docs_get_document",
+    "description": "Bir belgenin meta bilgilerini (başlık, sürüm, sahip, tarih, erişim) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "doc_id": {
+          "type": "string",
+          "description": "Belge kimliği, 'DOC-1234' biçiminde"
+        }
+      },
+      "required": [
+        "doc_id"
+      ]
+    }
+  },
+  {
+    "name": "docs_get_request_status",
+    "description": "Bir belge talebinin hazırlanma durumunu getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "description": "Belge talebi kimliği, 'DRQ-1234' biçiminde"
+        }
+      },
+      "required": [
+        "request_id"
+      ]
+    }
+  },
+  {
+    "name": "docs_share_document",
+    "description": "Bir belgeyi belirli kişilerle paylaşır / erişim verir. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "doc_id": {
+          "type": "string",
+          "description": "Belge kimliği, 'DOC-1234' biçiminde"
+        },
+        "recipient_id": {
+          "type": "string",
+          "description": "Paylaşılacak personel"
+        },
+        "access_level": {
+          "type": "string",
+          "description": "Erişim düzeyi",
+          "enum": [
+            "view",
+            "comment",
+            "edit"
+          ]
+        }
+      },
+      "required": [
+        "doc_id",
+        "recipient_id"
+      ]
+    }
+  },
+  {
+    "name": "docs_list_folder",
+    "description": "Bir klasördeki belgeleri listeler.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "folder_id": {
+          "type": "string",
+          "description": "Klasör kimliği"
+        }
+      },
+      "required": [
+        "folder_id"
+      ]
+    }
+  },
+  {
+    "name": "docs_request_signature",
+    "description": "Bir belge için elektronik imza akışı başlatır. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "doc_id": {
+          "type": "string",
+          "description": "Belge kimliği, 'DOC-1234' biçiminde"
+        },
+        "signer_id": {
+          "type": "string",
+          "description": "İmzalayacak kişi"
+        }
+      },
+      "required": [
+        "doc_id",
+        "signer_id"
+      ]
+    }
+  },
+  {
+    "name": "reporting_run_report",
+    "description": "Kayıtlı bir raporu verilen parametrelerle çalıştırır ve sonucu döndürür.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "report_id": {
+          "type": "string",
+          "description": "Rapor kimliği, 'RPT-1234' biçiminde"
+        },
+        "period": {
+          "type": "string",
+          "description": "Dönem parametresi"
+        }
+      },
+      "required": [
+        "report_id"
+      ]
+    }
+  },
+  {
+    "name": "reporting_list_reports",
+    "description": "Bir kategoriye göre kayıtlı raporları listeler.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "description": "Rapor kategorisi",
+          "enum": [
+            "sales",
+            "finance",
+            "hr",
+            "operations"
+          ]
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "reporting_export_dataset",
+    "description": "Bir veri kümesini seçilen formatta dışa aktarır (kişisel/gizli veri hariç). Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "dataset_id": {
+          "type": "string",
+          "description": "Veri kümesi kimliği, 'DS-1234' biçiminde"
+        },
+        "format": {
+          "type": "string",
+          "description": "Format",
+          "enum": [
+            "csv",
+            "xlsx",
+            "json"
+          ]
+        }
+      },
+      "required": [
+        "dataset_id",
+        "format"
+      ]
+    }
+  },
+  {
+    "name": "reporting_get_kpi_snapshot",
+    "description": "Bir birim için güncel temel performans göstergesi (KPI) özetini getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "unit_name": {
+          "type": "string",
+          "description": "Birim adı"
+        },
+        "period": {
+          "type": "string",
+          "description": "Dönem"
+        }
+      },
+      "required": [
+        "unit_name"
+      ]
+    }
+  },
+  {
+    "name": "support_get_customer_health",
+    "description": "Bir müşterinin sağlık skorunu (kullanım, memnuniyet, ödeme) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "customer_id": {
+          "type": "string",
+          "description": "Müşteri kimliği, 'CUS-1234' biçiminde"
+        }
+      },
+      "required": [
+        "customer_id"
+      ]
+    }
+  },
+  {
+    "name": "support_list_open_cases",
+    "description": "Bir müşteri veya atanan kişiye göre açık destek kayıtlarını listeler.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "customer_id": {
+          "type": "string",
+          "description": "Müşteri kimliği"
+        },
+        "assignee_id": {
+          "type": "string",
+          "description": "Atanan personel"
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "support_create_case",
+    "description": "Yeni bir müşteri destek kaydı oluşturur.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "customer_id": {
+          "type": "string",
+          "description": "Müşteri kimliği"
+        },
+        "subject": {
+          "type": "string",
+          "description": "Konu"
+        },
+        "severity": {
+          "type": "string",
+          "description": "Önem",
+          "enum": [
+            "s1",
+            "s2",
+            "s3",
+            "s4"
+          ]
+        }
+      },
+      "required": [
+        "customer_id",
+        "subject"
+      ]
+    }
+  },
+  {
+    "name": "support_escalate_case",
+    "description": "Bir destek kaydını üst seviye ekibe yükseltir. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "case_id": {
+          "type": "string",
+          "description": "Destek kaydı kimliği, 'CASE-1234' biçiminde"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Yükseltme gerekçesi"
+        }
+      },
+      "required": [
+        "case_id",
+        "reason"
+      ]
+    }
+  },
+  {
+    "name": "support_get_sla_status",
+    "description": "Bir destek kaydının SLA (yanıt/çözüm süresi) durumunu getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "case_id": {
+          "type": "string",
+          "description": "Destek kaydı kimliği, 'CASE-1234' biçiminde"
+        }
+      },
+      "required": [
+        "case_id"
+      ]
+    }
+  }
+]

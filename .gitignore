@@ -1,8 +1,15 @@
 __pycache__/
 *.pyc
-.DS_Store
 .pytest_cache/
+.DS_Store
+
+# Tam train/val seti — DETERMİNİSTİK üretilir (python scripts/generate_dataset.py
+# -> byte-aynı). Git'te üretici + katalog + data/sample/ + tool şemaları +
+# hard_eval (küçük, sabit değerlendirme çıpası) tutulur; ~110 MB ham jsonl değil.
+data/tool_calling_train.jsonl
+data/tool_calling_train.meta.jsonl
+data/tool_calling_val.jsonl
+data/tool_calling_val.meta.jsonl
 
 # Opsiyonel, yeniden üretilebilir eğitim varyantları
-# (scripts/build_training_variants.py ile oluşturulur)
 data/variants/

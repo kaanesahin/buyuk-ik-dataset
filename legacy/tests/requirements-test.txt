@@ -1,0 +1,3 @@
+# Büyük İK dataset test bağımlılıkları.
+# Üretici (scripts/generate_dataset.py) STDLIB-ONLY kalır; bu dosya YALNIZCA testler içindir.
+pytest>=7.0

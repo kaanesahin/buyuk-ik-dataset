@@ -1,0 +1,345 @@
+[
+  {
+    "name": "hr_get_manager",
+    "description": "Bir çalışanın bağlı olduğu yöneticinin bilgisini getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        }
+      },
+      "required": [
+        "employee_id"
+      ]
+    }
+  },
+  {
+    "name": "hr_update_leave_request",
+    "description": "Mevcut bir izin talebinin tarihlerini günceller. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "description": "Talep kimliği"
+        },
+        "new_start_date": {
+          "type": "string",
+          "description": "Yeni başlangıç"
+        },
+        "new_end_date": {
+          "type": "string",
+          "description": "Yeni bitiş"
+        }
+      },
+      "required": [
+        "request_id",
+        "new_start_date",
+        "new_end_date"
+      ]
+    }
+  },
+  {
+    "name": "payroll_get_payslip",
+    "description": "Bir çalışanın belirli bir aya ait bordro dökümünü getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        },
+        "period": {
+          "type": "string",
+          "description": "Bordro dönemi, YYYY-AA"
+        }
+      },
+      "required": [
+        "employee_id",
+        "period"
+      ]
+    }
+  },
+  {
+    "name": "timesheet_submit_time_correction",
+    "description": "Bir çalışanın puantaj düzeltme talebini oluşturur. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "description": "Personel kimliği, 'EMP-1234' biçiminde"
+        },
+        "date": {
+          "type": "string",
+          "description": "Düzeltilecek gün"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Düzeltme gerekçesi"
+        }
+      },
+      "required": [
+        "employee_id",
+        "date",
+        "reason"
+      ]
+    }
+  },
+  {
+    "name": "finance_create_purchase_order",
+    "description": "Bir tedarikçiye satın alma siparişi oluşturur. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "vendor_id": {
+          "type": "string",
+          "description": "Tedarikçi kimliği"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Sipariş tutarı"
+        },
+        "description": {
+          "type": "string",
+          "description": "Kalem açıklaması"
+        }
+      },
+      "required": [
+        "vendor_id",
+        "amount",
+        "description"
+      ]
+    }
+  },
+  {
+    "name": "crm_update_deal_stage",
+    "description": "Bir satış fırsatının aşamasını ilerletir/değiştirir. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "deal_id": {
+          "type": "string",
+          "description": "Fırsat kimliği, 'DEA-1234' biçiminde"
+        },
+        "stage": {
+          "type": "string",
+          "description": "Yeni aşama",
+          "enum": [
+            "lead",
+            "qualified",
+            "proposal",
+            "negotiation",
+            "won",
+            "lost"
+          ]
+        }
+      },
+      "required": [
+        "deal_id",
+        "stage"
+      ]
+    }
+  },
+  {
+    "name": "crm_get_customer_churn_risk",
+    "description": "Bir hesabın güncel kayıp (churn) risk skorunu ve etkenlerini getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "type": "string",
+          "description": "Hesap kimliği, 'ACC-1234' biçiminde"
+        }
+      },
+      "required": [
+        "account_id"
+      ]
+    }
+  },
+  {
+    "name": "it_get_asset",
+    "description": "Bir zimmet varlığının (dizüstü, telefon, monitör) kayıt bilgisini getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "asset_id": {
+          "type": "string",
+          "description": "Varlık kimliği, 'AST-1234' biçiminde"
+        }
+      },
+      "required": [
+        "asset_id"
+      ]
+    }
+  },
+  {
+    "name": "logistics_schedule_pickup",
+    "description": "Bir sevkiyat için taşıyıcıdan alım (pickup) randevusu oluşturur. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "shipment_id": {
+          "type": "string",
+          "description": "Sevkiyat kimliği, 'SHP-1234' biçiminde"
+        },
+        "pickup_date": {
+          "type": "string",
+          "description": "Alım tarihi"
+        }
+      },
+      "required": [
+        "shipment_id",
+        "pickup_date"
+      ]
+    }
+  },
+  {
+    "name": "inventory_create_stock_transfer",
+    "description": "İki depo arasında stok transferi oluşturur. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "description": "Ürün kimliği, 'ITM-1234' biçiminde"
+        },
+        "from_warehouse": {
+          "type": "string",
+          "description": "Kaynak depo"
+        },
+        "to_warehouse": {
+          "type": "string",
+          "description": "Hedef depo"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Miktar"
+        }
+      },
+      "required": [
+        "item_id",
+        "from_warehouse",
+        "to_warehouse",
+        "quantity"
+      ]
+    }
+  },
+  {
+    "name": "sales_cancel_order",
+    "description": "Bir satış siparişini iptal eder. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "order_id": {
+          "type": "string",
+          "description": "Sipariş kimliği, 'ORD-1234' biçiminde"
+        },
+        "reason": {
+          "type": "string",
+          "description": "İptal gerekçesi"
+        }
+      },
+      "required": [
+        "order_id",
+        "reason"
+      ]
+    }
+  },
+  {
+    "name": "calendar_reschedule_event",
+    "description": "Bir takvim etkinliğini yeni bir zamana taşır. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "description": "Etkinlik kimliği, 'EVT-1234' biçiminde"
+        },
+        "new_start": {
+          "type": "string",
+          "description": "Yeni başlangıç"
+        }
+      },
+      "required": [
+        "event_id",
+        "new_start"
+      ]
+    }
+  },
+  {
+    "name": "docs_search",
+    "description": "Anahtar kelime, tür veya sahibe göre belgeleri arar.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Aranacak ifade"
+        },
+        "doc_type": {
+          "type": "string",
+          "description": "Belge türü",
+          "enum": [
+            "policy",
+            "report",
+            "contract",
+            "form"
+          ]
+        }
+      },
+      "required": [
+        "query"
+      ]
+    }
+  },
+  {
+    "name": "reporting_schedule_report",
+    "description": "Bir raporun düzenli aralıklarla e-posta ile gönderilmesini planlar. Onay gerektirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "report_id": {
+          "type": "string",
+          "description": "Rapor kimliği, 'RPT-1234' biçiminde"
+        },
+        "frequency": {
+          "type": "string",
+          "description": "Sıklık",
+          "enum": [
+            "daily",
+            "weekly",
+            "monthly"
+          ]
+        },
+        "recipient": {
+          "type": "string",
+          "description": "Alıcı e-posta"
+        }
+      },
+      "required": [
+        "report_id",
+        "frequency",
+        "recipient"
+      ]
+    }
+  },
+  {
+    "name": "support_get_customer",
+    "description": "Bir müşterinin destek profilini (plan, açık kayıt sayısı, SLA seviyesi) getirir.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "customer_id": {
+          "type": "string",
+          "description": "Müşteri kimliği, 'CUS-1234' biçiminde"
+        }
+      },
+      "required": [
+        "customer_id"
+      ]
+    }
+  }
+]

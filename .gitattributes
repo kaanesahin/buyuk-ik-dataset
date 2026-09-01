@@ -1,0 +1,10 @@
+# Veri seti dosyaları platformdan bağımsız LF olmalı (validator LF bekler,
+# üretici byte-aynı çıktı verir). autocrlf ayarına bakılmaksızın zorla.
+*.jsonl   text eol=lf
+*.json    text eol=lf
+*.py      text eol=lf
+*.md      text eol=lf
+*.txt     text eol=lf
+*.ini     text eol=lf
+.gitignore   text eol=lf
+.gitattributes text eol=lf
