@@ -10,9 +10,15 @@ durumu ölçer; `meta.probe` alanı hangi testi temsil ettiğini söyler:
   P3_category_new_surface: görülen tool KATEGORİSİ + havuz-dışı doğal dil
   P4_same_kw_diff_tool   : aynı yüzey kelimesi birden çok tool'a uyar, doğru olan seçilmeli
   P5_same_tool_new_phrasing: eğitimdeki bir tool, tamamen farklı ifade biçimiyle
-  P6_large_candidate_set : 45-90 aday tool arasından seçim
+  P6_large_candidate_set : 42-62 aday tool arasından seçim
+  P7_cannot_answer       : uygun tool yok / kapsam dışı -> kibar ret
+  P8_clarification       : çelişkili parametre -> netleştirme sorusu
+  P9_tool_result         : görülmemiş tool sonucunu yorumlama (uydurma yok)
 
-Ayrıca cannot_answer / clarification / tool-result probe'ları.
+Örnek sayıları K-2 (istatistiksel güç) için ~3× büyütüldü; genelleme kapısının
+kontrol kolu olan P5 en çok büyüyen probe'tur (~35 -> ~200). "Policy taşındı mı"
+sorusu eğitim sonrası top-1(P5) - top-1(P1) farkıyla ölçülür; her iki tarafın da
+tool başına yeterli örneği olmalı.
 
 Kullanım: python scripts/build_hard_eval.py
 """
@@ -20,6 +26,7 @@ from __future__ import annotations
 
 import json
 import random
+import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -34,6 +41,7 @@ except Exception:
 from catalog import TOOLS  # noqa: E402
 from gen import scenarios as SC  # noqa: E402
 from gen.catalog_index import Index, CANNOT_POOL  # noqa: E402
+from gen.frames import denorm, tr_lower  # noqa: E402
 from generate_dataset import Idx, norm_sig  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -72,52 +80,71 @@ def build():
         seen.add(s)
         rec.meta["probe"] = probe
         rec.meta["split"] = "hard_eval"
+        # P6 dışındaki probe'larda aday listeyi ~24'e sınırla (dosya boyutu; büyük
+        # liste stresi bilinçli olarak yalnız P6'nın işi). Hedef her zaman kalır.
+        if probe != "P6_large_candidate_set" and len(rec.tools) > 26:
+            called = {n for msg in rec.messages if msg["role"] == "assistant"
+                      for n in re.findall(r'"name":\s*"([^"]+)"', msg["content"])}
+            keep = [t for t in rec.tools if t["name"] in called]
+            rest = [t for t in rec.tools if t["name"] not in called]
+            rng.shuffle(rest)
+            keep += rest[: max(0, rng.randint(14, 24) - len(keep))]
+            rng.shuffle(keep)
+            rec.tools = keep
+            rec.meta["candidate_count"] = len(keep)
         rows.append(rec)
 
     test_reads = _pick(rng, "test", "read")
     test_writes = [t for t in TOOLS if t.split == "test" and t.cat in ("write", "action")]
     val_reads = _pick(rng, "val", "read")
     train_reads = _pick(rng, "train", "read")
+    kw_pool = [t for t in test_reads + train_reads if idx.index.keyword_siblings(t.name)]
+
+    # NOT: sayılar K-2 (istatistiksel güç) için ~3× büyütüldü. Özellikle P5 (görülen
+    # tool + yeni ifade) — "policy taşındı mı" kapısının kontrol kolu — ~35 → ~200.
+    # P4 (aynı kelime) ve P8 (netleştirme) de zayıftı; onlar da büyütüldü.
 
     # P1: görülmemiş tool (test) — standart read + write
-    for _ in range(70):
+    for _ in range(135):
         t = rng.choice(test_reads)
         emit(SC.gen_read_call(rng, idx, t, with_result_p=0.35), "P1_unseen_tool")
-    for _ in range(25):
+    for _ in range(55):
         t = rng.choice(test_writes or test_reads)
         emit(SC.gen_write_execute(rng, idx, t) if t.cat != "read"
              else SC.gen_read_call(rng, idx, t), "P1_unseen_tool")
 
     # P2: görülen senaryo kalıbı (missing-param, multi) + görülmemiş tool
-    for _ in range(30):
+    for _ in range(75):
         t = rng.choice([x for x in test_reads + test_writes if x.required])
         emit(SC.gen_missing_param(rng, idx, t), "P2_seen_intent_new_tool")
 
     # P3: görülen KATEGORİ + havuz-dışı yüzey (test tool; mevcut grounded metni sar)
-    for _ in range(35):
+    for _ in range(100):
         t = rng.choice(test_reads)
         rec = SC.gen_read_call(rng, idx, t, with_result_p=0.0)
         pre, post = rng.choice(UNSEEN_WRAPS)
         base = rec.messages[0]["content"]
-        rec.messages[0]["content"] = (pre + (base[0].lower() + base[1:] if pre else base) + post).strip()
+        rec.messages[0]["content"] = denorm(
+            (pre + (tr_lower(base[:1]) + base[1:] if pre else base) + post).strip())
         emit(rec, "P3_category_new_surface")
 
-    # P4: aynı keyword farklı tool (test tool hedef, kardeşleri listede)
-    for _ in range(25):
-        t = rng.choice(test_reads)
+    # P4: aynı keyword farklı tool (hedef + kardeşleri listede) — test + train
+    for _ in range(110):
+        t = rng.choice(kw_pool or test_reads)
         emit(SC.gen_hn_keyword_ambiguous(rng, idx, t), "P4_same_kw_diff_tool")
 
-    # P5: eğitimdeki tool + havuz-dışı ifade sarmalı
-    for _ in range(35):
+    # P5: eğitimdeki tool + havuz-dışı ifade sarmalı  (genelleme kapısının kontrol kolu)
+    for _ in range(200):
         t = rng.choice(train_reads)
         rec = SC.gen_read_call(rng, idx, t, with_result_p=0.0)
         pre, post = rng.choice(UNSEEN_WRAPS)
         base = rec.messages[0]["content"]
-        rec.messages[0]["content"] = (pre + (base[0].lower() + base[1:] if pre else base) + post).strip()
+        rec.messages[0]["content"] = denorm(
+            (pre + (tr_lower(base[:1]) + base[1:] if pre else base) + post).strip())
         emit(rec, "P5_same_tool_new_phrasing")
 
-    # P6: 45-90 aday arasından seçim (test + train tool hedefler)
-    for _ in range(40):
+    # P6: 42-62 aday arasından seçim (test + train tool hedefler)
+    for _ in range(60):
         t = rng.choice(test_reads + train_reads)
         rec = SC.gen_read_call(rng, idx, t, with_result_p=0.0)
         big, names = idx.index.candidate_list(rng, [t.name], size=rng.randint(42, 62))
@@ -126,20 +153,20 @@ def build():
         emit(rec, "P6_large_candidate_set")
 
     # cannot_answer probe (kapsam-dışı + doğru tool listede yok)
-    for _ in range(25):
+    for _ in range(90):
         e = rng.choice(CANNOT_POOL)
         emit(SC.gen_cannot_scope(rng, idx, e), "P7_cannot_answer")
-    for _ in range(20):
+    for _ in range(60):
         t = rng.choice(test_reads + train_reads)
         emit(SC.gen_hn_tool_absent(rng, idx, t), "P7_cannot_answer")
 
     # clarification probe (çelişkili parametre)
-    for _ in range(15):
+    for _ in range(60):
         t = rng.choice([x for x in test_reads + train_reads if x.required])
         emit(SC.gen_hn_conflict(rng, idx, t), "P8_clarification")
 
     # tool-result probe (görülmemiş tool, sonucu yorumlama)
-    for _ in range(25):
+    for _ in range(75):
         t = rng.choice(test_reads)
         emit(SC.gen_read_call(rng, idx, t, with_result_p=1.0), "P9_tool_result")
 

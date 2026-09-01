@@ -52,18 +52,22 @@ USER_FRAMES_CHAIN_START = [
 ]
 
 # WRITE istekleri: kullanıcı bir işlem + ayrıntı verir (doğal)
+# NOT: {syn} tabanlı (baş sözcük GEÇMEYEN) kalıp oranı bilinçli yüksek tutulur —
+# WRITE tarafında nesne-adı → tool kısayolunu kırmak için (anti-shortcut).
 USER_FRAMES_WRITE = [
     "{subj}{obj} {verb}. Bilgiler: {plist_phrase}",
     "{subj}{syn} — {plist_phrase}. {verb2}",
     "{subj}{obj} {verb}: {plist_phrase}",
     "{plist_phrase} olacak şekilde {subj}{obj} {verb}",
-    "{subj}{obj_nom} için detaylar {plist_phrase}; {verb}",
+    "{subj}{syn}. Ayrıntılar: {plist_phrase}",
+    "{plist_phrase} — {subj}{syn}; gerekeni yap",
+    "{subj}{syn}? Elimde şunlar var: {plist_bare}",
     "{subj}{syn}. {plist_phrase} — gerekeni yap",
     "{plist_phrase}. {subj_cap}{obj} {verb}",
     # parametresiz (yalnız birincil kimlik özneye gömülü)
     "{subj}{obj} {verb}",
     "{subj}{syn} — {verb2}",
-    "{subj}{obj_nom}, {verb} lütfen",
+    "{subj}{syn}, {verb} lütfen",
 ]
 
 # --------------------------------------------------------------------------- #
@@ -214,6 +218,25 @@ def _fold(s):
     return s
 
 
+def tr_lower(s):
+    """Türkçe-güvenli küçük harf. Python'da 'İ'.lower() == 'i\\u0307' (i + birleşen
+    nokta) — bu artefaktı üretmeden 'İ'->'i', 'I'->'ı' yapar."""
+    return s.replace("İ", "i").replace("I", "ı").lower()
+
+
+def tr_upper(s):
+    return s.replace("i", "İ").replace("ı", "I").upper()
+
+
+_COMBINING_DOT = chr(0x0307)
+
+
+def denorm(s):
+    """Metne sızmış birleşen noktayı (U+0307) temizle — son güvenlik ağı.
+    Python'da 'İ'.lower() bunu üretir; Türkçe düz metinde bu işaret kullanılmaz."""
+    return s.replace(_COMBINING_DOT, "") if _COMBINING_DOT in s else s
+
+
 FORMAL_PRE = ["Sayın yetkili, ", "İlgili birime iletilmek üzere: ", "Merhaba, ",
               "Konu hakkında bilgi rica ediyorum: ", "İyi çalışmalar; "]
 FORMAL_POST = [" Gereğini rica ederim.", " Yardımlarınız için teşekkürler.",
@@ -234,17 +257,20 @@ _TYPO_MAP = [("mış", "mis"), ("miş", "mis"), ("değil", "degil"), ("bir", "bi
 
 
 def apply_typos(rng, text):
+    """Yaygın Türkçe yazım hataları — ID/sayı token'ları korunur. Metni okunmaz
+    hale getirmeyecek kadar ölçülü (K-minor): en çok bir harf yer değiştirmesi,
+    soru işareti korunur."""
     prot = []
     def _p(m):
         prot.append(m.group(0)); return f"\x00{len(prot)-1}\x00"
     t = re.sub(r"[A-Z]{2,}-\d+|#?\d[\d.:/]*\d|\d+", _p, text)
     t = _fold(t)
     for a, b in _TYPO_MAP:
-        if rng.random() < 0.35:
+        if rng.random() < 0.28:
             t = t.replace(a, b)
-    t = t.replace("?", "").replace(".", "")
-    if rng.random() < 0.4:
-        # rastgele bir harf çiftini yer değiştir
+    t = t.replace(".", "")
+    if rng.random() < 0.22:
+        # rastgele bir harf çiftini yer değiştir (tek sefer)
         i = rng.randint(0, max(0, len(t) - 3))
         if t[i].isalpha() and t[i + 1].isalpha() and t[i] != " " and t[i+1] != " ":
             t = t[:i] + t[i + 1] + t[i] + t[i + 2:]
@@ -252,8 +278,8 @@ def apply_typos(rng, text):
     return t.strip()
 
 
-REGISTER_WEIGHTS = [("plain", 30), ("formal", 17), ("chat", 17), ("long", 15),
-                    ("typo", 15), ("short", 6)]
+REGISTER_WEIGHTS = [("plain", 30), ("formal", 18), ("chat", 18), ("long", 15),
+                    ("typo", 12), ("short", 7)]
 
 
 def style(rng, text, register=None):
@@ -263,21 +289,24 @@ def style(rng, text, register=None):
                                weights=[w for _, w in REGISTER_WEIGHTS])[0]
     t = text.strip().rstrip(" .?!")
     if register == "plain":
-        return text, "plain"
-    if register == "formal":
-        head = t[0].lower() + t[1:]
-        return rng.choice(FORMAL_PRE) + head + "." + rng.choice(FORMAL_POST), "formal"
-    if register == "chat":
+        out = text
+    elif register == "formal":
+        head = tr_lower(t[0]) + t[1:]
+        out = rng.choice(FORMAL_PRE) + head + "." + rng.choice(FORMAL_POST)
+    elif register == "chat":
         if rng.random() < 0.5:
-            return rng.choice(CHAT_PRE) + (t[0].lower() + t[1:]), "chat"
-        return t + rng.choice(CHAT_POST) + "?", "chat"
-    if register == "long":
-        core = t[0].upper() + t[1:] + "."
-        return rng.choice(LONG_PRE) + core + rng.choice(LONG_POST), "long"
-    if register == "typo":
-        return apply_typos(rng, text), "typo"
-    if register == "short":
+            out = rng.choice(CHAT_PRE) + (tr_lower(t[0]) + t[1:])
+        else:
+            out = t + rng.choice(CHAT_POST) + "?"
+    elif register == "long":
+        core = tr_upper(t[0]) + t[1:] + "."
+        out = rng.choice(LONG_PRE) + core + rng.choice(LONG_POST)
+    elif register == "typo":
+        out = apply_typos(rng, text)
+    elif register == "short":
         # yalnız çekirdeği bırak: ilk 6 kelime, noktalama yok
         words = t.split()
-        return " ".join(words[: rng.randint(3, 6)]), "short"
-    return text, "plain"
+        out = " ".join(words[: rng.randint(3, 6)])
+    else:
+        register, out = "plain", text
+    return denorm(out), register

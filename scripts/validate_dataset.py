@@ -344,28 +344,42 @@ def aggregate_checks(train, val, tmeta, vmeta, rep):
     rep.info.append(f"tool-result turu: {trr}/{len(tmeta)} (%{100*trr/len(tmeta):.0f}) "
                     f"| tool_call içinde %{100*trr/max(tc,1):.0f}")
 
-    # KEYWORD -> TOOL ADI korelasyonu (K-1)
+    # KEYWORD -> TOOL ADI korelasyonu (K-1) — iki ölçüt: en nadir ayırt edici
+    # token (alt sınır, kayırmalı) + nesnenin ana adı (dürüst üst sınır).
+    _OBJ_STOP = {"kaydi", "kaydini", "bilgisi", "bilgi", "durumu", "durum", "listesi",
+                 "ozeti", "ozet", "talebi", "talep", "icin"}
     kw_hit = defaultdict(lambda: [0, 0])
+    obj_hit = defaultdict(lambda: [0, 0])
     for d, m in zip(train, tmeta):
         tgts = m.get("target_tools", [])
         if len(tgts) != 1 or m["decision"] not in ("tool_call", "request_for_info"):
             continue
         tool = CATALOG[tgts[0]]
-        if not tool.disc_kw:
-            continue
         u = fold(" ".join(x["content"] for x in d["messages"] if x["role"] == "user"))
-        kw_hit[tool.name][1] += 1
-        if any(fold(k) in u for k in tool.disc_kw):
-            kw_hit[tool.name][0] += 1
-    rates = {n: h / t for n, (h, t) in kw_hit.items() if t >= 10}
-    if rates:
-        overall = sum(h for h, _ in kw_hit.values()) / sum(t for _, t in kw_hit.values())
-        hi = sorted(rates.items(), key=lambda x: -x[1])[:8]
-        rep.info.append(f"keyword->tool korelasyonu: genel %{100*overall:.0f} "
-                        f"(hedef < %55) | en yüksek: " +
-                        ", ".join(f"{n.split('_',1)[1]} %{100*r:.0f}" for n, r in hi))
-        if overall > 0.55:
-            rep.W(f"keyword->tool korelasyonu yüksek (%{100*overall:.0f}) — K-1 riski")
+        if tool.disc_kw:
+            kw_hit[tool.name][1] += 1
+            if any(fold(k) in u for k in tool.disc_kw):
+                kw_hit[tool.name][0] += 1
+        heads = [w for src in (tool.obj_nom, tool.obj)
+                 for w in re.findall(r"[a-zçğıöşü]+", fold(src))
+                 if len(w) >= 3 and w not in _OBJ_STOP][:2]
+        if heads:
+            obj_hit[tool.name][1] += 1
+            if any(w in u for w in heads):
+                obj_hit[tool.name][0] += 1
+    if kw_hit:
+        o_disc = sum(h for h, _ in kw_hit.values()) / sum(t for _, t in kw_hit.values())
+        o_obj = sum(h for h, _ in obj_hit.values()) / max(1, sum(t for _, t in obj_hit.values()))
+        hi = sorted(((n, h / t) for n, (h, t) in obj_hit.items() if t >= 10),
+                    key=lambda x: -x[1])[:8]
+        rep.info.append(f"K-1 yüzey→tool korelasyonu: nesne ana-adı %{100*o_obj:.0f} (dürüst) | "
+                        f"en nadir ayırt edici token %{100*o_disc:.0f} (alt sınır) | "
+                        f"ana-ad en yüksek: " +
+                        ", ".join(f"{n.split('_', 1)[1]} %{100*r:.0f}" for n, r in hi))
+        if o_disc > 0.55:
+            rep.W(f"en nadir token korelasyonu yüksek (%{100*o_disc:.0f}) — K-1 regresyonu")
+        if o_obj > 0.70:
+            rep.W(f"nesne ana-adı korelasyonu yüksek (%{100*o_obj:.0f}) — dolaylı ifade payı düşük")
 
     # register
     rr = Counter(m["register"] for m in tmeta)

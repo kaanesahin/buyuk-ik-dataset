@@ -29,6 +29,14 @@ class Record:
     messages: list
     meta: dict = field(default_factory=dict)
 
+    def __post_init__(self):
+        # tek chokepoint: 'İ'.lower() kaynaklı birleşen-nokta (U+0307) artefaktını
+        # her mesajdan temizle (K-minor: NFC pass).
+        for m in self.messages:
+            c = m.get("content")
+            if isinstance(c, str):
+                m["content"] = F.denorm(c)
+
 
 # --------------------------------------------------------------------------- #
 #  Yardımcılar
@@ -96,7 +104,7 @@ def _fill_user(rng, tool, must_surfaces, subj_slot, *, allow_oblique=True,
 
     ctx = {
         "subj": subj,
-        "subj_cap": (subj[:1].upper() + subj[1:]) if subj else "",
+        "subj_cap": (_cap(subj)) if subj else "",
         "subj_tail": rng.choice(F.SUBJ_TAIL),
         "obj": tool.obj, "obj_nom": tool.obj_nom,
         "verb": rng.choice(tool.verbs),
@@ -127,7 +135,7 @@ def _fill_user(rng, tool, must_surfaces, subj_slot, *, allow_oblique=True,
         if has_extra:
             txt += f": {plist_phrase}"
     txt = re.sub(r"\s+", " ", txt).strip(" ,;")
-    txt = txt[:1].upper() + txt[1:]
+    txt = _cap(txt)
 
     # ÖNCE stillendir (kısa/yazım-hatası kaydı içeriği kısaltabilir) SONRA garanti et
     styled, reg = F.style(rng, txt)
@@ -167,6 +175,11 @@ def _fold(s):
     return F._fold(s)
 
 
+def _cap(s):
+    """Türkçe-güvenli ilk harf büyütme (i -> İ)."""
+    return F.tr_upper(s[:1]) + s[1:]
+
+
 def _kw_hit(tool, text):
     """Ayırt edici yüzey sözcüğü metinde geçiyor mu (K-1 ölçümü için)."""
     f = _fold(text)
@@ -188,33 +201,76 @@ _TERMS = ("30 gün vadeli", "60 gün vadeli", "peşin", "45 gün vadeli", "kapı
 _LOCATIONS = ("Gebze Deposu", "Hadımköy Antrepo", "yolda - Ankara yakını", "İzmir Şube",
               "Merkez Depo", "gümrükte", "dağıtım merkezinde")
 _STATES = ("pending", "approved", "in_progress", "resolved", "completed", "rejected", "on_hold")
+_CURRENCIES = ("TRY", "EUR", "USD")
+_ASSET_TYPES = ("dizüstü bilgisayar", "masaüstü bilgisayar", "cep telefonu", "monitör",
+                "tablet", "yazıcı", "docking istasyonu")
+_PRODUCT_NAMES = ("A4 fotokopi kağıdı", "toner kartuş", "arşiv klasörü", "termal etiket rulosu",
+                  "koli bandı", "USB bellek 32GB", "kablo kanalı", "beyaz tahta kalemi")
+_REPORT_SUMMARIES = ("hedeflerin çoğu tutturuldu, önceki döneme göre artış var",
+                     "kayıt sayısı düştü, ortalama çözüm süresi iyileşti",
+                     "üç kalemde bütçe aşımı görünüyor, kalan çeyrekte önlem gerekli",
+                     "sonuçlar yatay seyrediyor, en yüksek katkı kurumsal segmentten",
+                     "gecikme oranı azaldı, müşteri memnuniyeti hafif yükseldi")
+_ESCALATION_TEAMS = ("2. kademe destek", "kıdemli mühendislik", "ürün ekibi",
+                     "saha operasyon", "müşteri başarı ekibi")
+_CHURN_FACTORS = ("fiyat", "hizmet kalitesi", "rakip teklifi", "kullanım düşüşü", "destek gecikmesi")
+
+# isim / şirket adına işaret eden anahtar kökleri
+_PERSON_KEYS = {"full_name", "manager", "manager_name", "owner", "assignee", "assigned_to",
+                "decided_by", "approver", "signer", "reporter", "created_by", "requested_by",
+                "contact_name", "employee_name", "rep_name"}
+_ORG_KEYS = {"account", "account_name", "company", "company_name", "vendor_name", "customer_name"}
 
 
-def _synth_result_value(key, kind, rng, today):
+def _synth_result_value(key, kind, rng, today, tool=None):
     k = key.lower()
+    dom = tool.domain if tool else ""
+
     if k in ("status", "state"):
         return rng.choice(_STATES)
-    if k in ("score", "nps", "utilization", "pct", "health"):
+    if k in ("score", "nps", "utilization", "health") or k.endswith("_score"):
         return rng.randint(35, 98)
     if k == "breached":
         return rng.choice([0, 0, 0, 1])
-    if "name" in k and ("vendor" in k or "company" in k or k == "name"):
-        return rng.choice(_COMPANIES) if rng.random() < 0.5 else S.gen_name(rng, full=True).canonical
+    if k in ("sub_teams", "payments", "open_deals", "open_cases", "records_count"):
+        return rng.randint(0, 8)          # küçük sayılar (birim başı alt-ekip vb.)
+    if k in ("currency", "currency_code", "para_birimi"):
+        return rng.choice(_CURRENCIES)
+
+    # --- şirket / hesap / tedarikçi adı (kişiden ÖNCE kontrol) ---
+    if k in _ORG_KEYS or ("name" in k and any(x in k for x in ("vendor", "company", "account", "customer"))):
+        return rng.choice(_COMPANIES)
+    if k == "name" and kind == "title":            # tedarikçi/ürün kaydının adı
+        return rng.choice(_PRODUCT_NAMES) if dom == "inventory" else rng.choice(_COMPANIES)
+
+    # --- kişi adı ---
+    if kind == "name" or k in _PERSON_KEYS:
+        return S.gen_name(rng, full=True).canonical
+
     if "industry" in k or "sector" in k:
         return rng.choice(_INDUSTRIES)
     if "term" in k or k == "payment_terms":
         return rng.choice(_TERMS)
-    if k in ("manager_name", "owner", "assignee", "decided_by", "approver", "signer"):
-        return S.gen_name(rng, full=True).canonical
-    if k in ("manager_title", "title", "unit", "category", "plan", "sla_tier", "trend",
-             "top_factor", "escalated_to", "carrier"):
+    if k in ("type", "asset_type", "device_type", "item_type"):
+        return rng.choice(_ASSET_TYPES)
+    if k in ("summary", "highlights", "headline", "note", "notes"):
+        return rng.choice(_REPORT_SUMMARIES)
+    if k == "escalated_to":
+        return rng.choice(_ESCALATION_TEAMS)
+    if k == "top_factor":
+        return rng.choice(_CHURN_FACTORS)
+    if k == "title":                               # unvan mı belge başlığı mı — domaine göre
+        return rng.choice(S.DOC_TITLES) if dom in ("documents", "reporting") else rng.choice(S.TITLES)
+    if k in ("manager_title", "unit", "category", "plan", "sla_tier", "trend", "carrier"):
         pool = {"unit": S.ORG_UNITS, "category": ("Kırtasiye", "Elektronik", "Ambalaj", "Gıda"),
                 "plan": ("Standart", "Kurumsal", "Premium"), "sla_tier": ("Gümüş", "Altın", "Platin"),
-                "trend": ("yükseliyor", "sabit", "düşüyor"), "carrier": ("Aras", "MNG", "Yurtiçi", "UPS")}
+                "trend": ("yükseliyor", "sabit", "düşüyor"), "carrier": ("Aras", "MNG", "Yurtiçi", "UPS"),
+                "manager_title": S.TITLES}
         return rng.choice(pool.get(k, S.TITLES))
     if k == "location":
         return rng.choice(_LOCATIONS)
-    if kind in ("amount",):
+
+    if kind == "amount":
         return S.gen_amount(rng).canonical
     if kind in ("count", "hours", "pct", "duration"):
         return S.synth(kind, rng, today).canonical
@@ -228,6 +284,9 @@ def _synth_result_value(key, kind, rng, today):
         return S.gen_email(rng).canonical
     if kind == "enum":
         return rng.choice(_STATES)
+    if kind == "title":
+        return rng.choice(S.TITLES)
+    # son çare — yalnız gerçekten sayısal ölçüt kalır (isim/başlık artık buraya düşmez)
     return rng.randint(1, 90)
 
 
@@ -255,12 +314,34 @@ _RESULT_LABELS = {
     "nps": "NPS", "free_slots": "boş aralık", "slots": "uygun aralık", "top_factor": "başlıca etken",
     "escalated_to": "yükseltilen ekip", "ready_date": "hazır tarih", "paid_date": "ödeme tarihi",
     "version": "sürüm", "adjustment": "düzeltme", "transit_days": "transit gün", "price": "fiyat",
-    "unit_price": "birim fiyat", "decided_by": "karar veren",
+    "unit_price": "birim fiyat", "decided_by": "karar veren", "currency": "para birimi",
+    "manager": "yönetici", "assigned_to": "zimmetli", "type": "tür", "account": "bağlı hesap",
+    "summary": "özet", "category": "kategori", "daily_cap": "günlük tavan",
+    "needs_receipt": "fiş gerekli", "payments": "ödeme adedi", "row_count": "satır sayısı",
+    "email": "e-posta",
 }
 
 
-def _label(k):
+def _label(k, dom=None):
+    if k == "title" and dom in ("documents", "reporting"):
+        return "başlık"
     return _RESULT_LABELS.get(k, k.replace("_", " "))
+
+
+def _harmonize_result(res, rng):
+    """tool sonucunun iç tutarlılığı: net ≤ brüt, kesinti = brüt − net, kalan = ayrılan − harcanan."""
+    base = res.get("gross") if isinstance(res.get("gross"), (int, float)) else res.get("total")
+    if isinstance(base, (int, float)) and isinstance(res.get("net"), (int, float)):
+        if res["net"] > base:
+            res["net"] = int(base * rng.uniform(0.62, 0.85) / 500) * 500
+        if isinstance(res.get("deductions"), (int, float)):
+            res["deductions"] = max(0, base - res["net"])
+    alloc = res.get("allocated")
+    if isinstance(alloc, (int, float)) and isinstance(res.get("spent"), (int, float)):
+        res["spent"] = min(res["spent"], alloc)
+        if isinstance(res.get("remaining"), (int, float)):
+            res["remaining"] = alloc - res["spent"]
+    return res
 
 
 def synth_result(tool, rng, today, mode="ok", echo=None):
@@ -276,33 +357,35 @@ def synth_result(tool, rng, today, mode="ok", echo=None):
         fields = fields[: max(1, len(fields) // 2)]
     res = {}
     for k, kind in fields:
-        res[k] = _synth_result_value(k, kind, rng, today)
+        res[k] = _synth_result_value(k, kind, rng, today, tool)
+    _harmonize_result(res, rng)
     if echo:
         res.update(echo)
     return res, None
 
 
-def result_phrase(res):
+def result_phrase(res, tool=None):
+    dom = tool.domain if tool else None
     parts = []
     for k, v in res.items():
         if k in ("error", "matches"):
             continue
-        parts.append(f"{_label(k)} {_display(v)}")
+        parts.append(f"{_label(k, dom)} {_display(v)}")
     return "; ".join(parts) if parts else "kayıt döndü"
 
 
 def final_answer(rng, tool, res, mode, today):
     if mode == "error":
         return rng.choice(F.RESULT_ERROR).format(
-            obj_nom_cap=tool.obj_nom[:1].upper() + tool.obj_nom[1:],
+            obj_nom_cap=_cap(tool.obj_nom),
             obj_nom=tool.obj_nom, err=res.get("error", "hata"))
     if mode == "empty":
         return rng.choice(F.RESULT_EMPTY).format(
-            obj_nom_cap=tool.obj_nom[:1].upper() + tool.obj_nom[1:], obj_nom=tool.obj_nom)
-    ph = result_phrase(res)
+            obj_nom_cap=_cap(tool.obj_nom), obj_nom=tool.obj_nom)
+    ph = result_phrase(res, tool)
     tmpl = F.RESULT_PARTIAL if mode == "partial" else F.RESULT_OK
     return rng.choice(tmpl).format(
-        obj_nom_cap=tool.obj_nom[:1].upper() + tool.obj_nom[1:], obj_nom=tool.obj_nom,
+        obj_nom_cap=_cap(tool.obj_nom), obj_nom=tool.obj_nom,
         result_phrase=ph, subj_res="")
 
 
@@ -446,7 +529,7 @@ def gen_missing_param(rng, idx, tool):
 
     if len(missing) == 1:
         ask = rng.choice(F.ASK_MISSING).format(
-            human=missing[0].human, human_cap=missing[0].human[:1].upper() + missing[0].human[1:])
+            human=missing[0].human, human_cap=_cap(missing[0].human))
     else:
         hl = " ve ".join(m.human for m in missing)
         ask = rng.choice(F.ASK_MISSING_MULTI).format(human_list=hl)
@@ -508,7 +591,7 @@ def gen_write_confirm(rng, idx, tool):
     must = [(p, s) for p, s in surfaces if not (subj_slot and p is subj_slot[0])]
     utext, reg, kw = _fill_user(rng, tool, must, subj_slot, kind="write", oblique_p=0.4)
     ask = rng.choice(F.CONFIRM_ASK).format(
-        summary=summ, summary_cap=summ[:1].upper() + summ[1:])
+        summary=summ, summary_cap=_cap(summ))
     tools, names = idx.index.candidate_list(rng, [tool.name])
     return Record(tools, [
         {"role": "user", "content": utext},
@@ -529,7 +612,7 @@ def gen_write_execute(rng, idx, tool, with_result_p=0.5):
     args, surfaces, subj_slot, summ = _write_args_and_summary(rng, idx, tool)
     must = [(p, s) for p, s in surfaces if not (subj_slot and p is subj_slot[0])]
     utext, reg, kw = _fill_user(rng, tool, must, subj_slot, kind="write", oblique_p=0.4)
-    ask = rng.choice(F.CONFIRM_ASK).format(summary=summ, summary_cap=summ[:1].upper() + summ[1:])
+    ask = rng.choice(F.CONFIRM_ASK).format(summary=summ, summary_cap=_cap(summ))
     msgs = [
         {"role": "user", "content": utext},
         {"role": "assistant", "content": ask},
@@ -546,7 +629,7 @@ def gen_write_execute(rng, idx, tool, with_result_p=0.5):
             res["reference"] = ref
         msgs.append({"role": "tool", "content": json.dumps(res, ensure_ascii=False)})
         msgs.append({"role": "assistant", "content": rng.choice(F.WRITE_DONE).format(
-            summary=summ, summary_cap=summ[:1].upper() + summ[1:], ref=ref)})
+            summary=summ, summary_cap=_cap(summ), ref=ref)})
     tools, names = idx.index.candidate_list(rng, [tool.name])
     return Record(tools, msgs, {
         "decision": "tool_call", "scenario": "write_execute", "target_tools": [tool.name],
@@ -583,7 +666,7 @@ def gen_write_chain(rng, idx, tool):
     must = [(p, s) for p, s in surfaces if not (subj_slot and p is subj_slot[0])]
     u1, reg, kw = _fill_user(rng, tool, must, subj_slot, kind="chain")
     a1 = rng.choice(F.CHAIN_ASK_PARAM).format(
-        human=missing.human, human_cap=missing.human[:1].upper() + missing.human[1:])
+        human=missing.human, human_cap=_cap(missing.human))
     # eksik param'ı ver
     msl = _synth_param(missing, rng, today, direction=1 if missing.kind == "future_date" else 0)
     if missing.kind == "date_range":
@@ -594,7 +677,7 @@ def gen_write_chain(rng, idx, tool):
     u2 = rng.choice(["{s}", "{s} olsun", "Şöyle: {s}", "{s} deyelim"]).format(s=msl.surface)
     surfaces.append((missing, msl))
     summ = _summary_text(tool, surfaces)
-    a2 = rng.choice(F.CONFIRM_ASK).format(summary=summ, summary_cap=summ[:1].upper() + summ[1:])
+    a2 = rng.choice(F.CONFIRM_ASK).format(summary=summ, summary_cap=_cap(summ))
     u3 = rng.choice(F.ACK)
     a3 = tc_block(tool.name, args)
     tools, names = idx.index.candidate_list(rng, [tool.name], size=rng.choice([None, None, 12]))
@@ -646,7 +729,7 @@ def gen_multi_parallel(rng, idx, tool_a, tool_b):
     conj = rng.choice(["ve", "ile birlikte", "bir de"])
     detail = (" — " + ", ".join(_human_phrase(p, s) for p, s in extra_sfc)) if extra_sfc else ""
     u = f"{subj}{tool_a.obj} {conj} {tool_b.obj} {rng.choice(tool_a.verbs)}{detail}"
-    u = u[:1].upper() + u[1:]
+    u = _cap(u)
     u, reg = F.style(rng, u)
     u = _ensure_grounded(u, [(pa.human, sl)] + [(p.human, s) for p, s in extra_sfc])
     call = tc_block(tool_a.name, args_a) + "\n" + tc_block(tool_b.name, args_b)
@@ -657,8 +740,8 @@ def gen_multi_parallel(rng, idx, tool_a, tool_b):
         msgs.append({"role": "tool", "content": json.dumps(ra, ensure_ascii=False)})
         msgs.append({"role": "tool", "content": json.dumps(rb, ensure_ascii=False)})
         msgs.append({"role": "assistant", "content":
-                     f"{tool_a.obj_nom[:1].upper()+tool_a.obj_nom[1:]}: {result_phrase(ra)}. "
-                     f"{tool_b.obj_nom[:1].upper()+tool_b.obj_nom[1:]}: {result_phrase(rb)}."})
+                     f"{_cap(tool_a.obj_nom)}: {result_phrase(ra, tool_a)}. "
+                     f"{_cap(tool_b.obj_nom)}: {result_phrase(rb, tool_b)}."})
     tools, names = idx.index.candidate_list(rng, [tool_a.name, tool_b.name])
     return Record(tools, msgs, {
         "decision": "tool_call", "scenario": "multi_parallel",
@@ -719,7 +802,7 @@ def gen_multi_sequential(rng, idx, chain):
     u = (f"{given_surface} için {consumer.obj} {rng.choice(consumer.verbs)}"
          if given_kind == "name" else
          f"{given_surface} kaydından yola çıkıp {consumer.obj} {rng.choice(consumer.verbs)}")
-    u = u[:1].upper() + u[1:]
+    u = _cap(u)
     u, reg = F.style(rng, u)
     u = _ensure_grounded(u, [(gp.human, gsl)])
     msgs = [
@@ -729,7 +812,7 @@ def gen_multi_sequential(rng, idx, chain):
         {"role": "assistant", "content": tc_block(consumer.name, c_args)},
         {"role": "tool", "content": json.dumps(c_res, ensure_ascii=False)},
         {"role": "assistant", "content":
-         f"{given_surface} ({prod_val}) için {consumer.obj_nom}: {result_phrase(c_res)}."},
+         f"{given_surface} ({prod_val}) için {consumer.obj_nom}: {result_phrase(c_res, consumer)}."},
     ]
     tools, names = idx.index.candidate_list(rng, [resolver.name, consumer.name])
     return Record(tools, msgs, {
@@ -749,7 +832,7 @@ def gen_direct(rng, idx, entry, four_turn_p=0.22):
     q = rng.choice(qs)
     q, reg = F.style(rng, q)
     core = rng.choice(cores)
-    a = rng.choice(F.DIRECT_WRAP).format(core=core, core_low=core[:1].lower() + core[1:])
+    a = rng.choice(F.DIRECT_WRAP).format(core=core, core_low=F.tr_lower(core[:1]) + core[1:])
     msgs = [{"role": "user", "content": q}, {"role": "assistant", "content": a}]
     four = rng.random() < four_turn_p and len(cores) > 1 and dom != "meta"
     if four:
@@ -839,7 +922,7 @@ def gen_hn_keyword_ambiguous(rng, idx, tool):
         "{subj}{kw} derken tam olarak şunu istiyorum: {syn}{detail}",
     ])
     u = frame.format(subj=subj, kw=kwtok, syn=syn, detail=detail)
-    u = u[:1].upper() + u[1:]
+    u = _cap(u)
     u, reg = F.style(rng, u)
     _need = ([(subj_slot[0].human, subj_slot[1])] if subj_slot else []) + [(p.human, s) for p, s in must]
     u = _ensure_grounded(u, _need)
@@ -890,10 +973,10 @@ def gen_hn_conflict(rng, idx, tool):
         subj = (rng.choice(F.SUBJ_EMP).format(emp=sl.surface) if p.kind != "name"
                 else rng.choice(F.SUBJ_NAME).format(name=sl.surface))
     u = f"{subj}{tool.obj} {rng.choice(tool.verbs)}; {conflict}"
-    u = u[:1].upper() + u[1:]
+    u = _cap(u)
     u, reg = F.style(rng, u)
     ask = rng.choice(F.CONFLICT_ASK).format(
-        conflict=conflict, conflict_cap=conflict[:1].upper() + conflict[1:])
+        conflict=conflict, conflict_cap=_cap(conflict))
     tools, names = idx.index.candidate_list(rng, [tool.name])
     return Record(tools, [
         {"role": "user", "content": u}, {"role": "assistant", "content": ask},
@@ -961,7 +1044,7 @@ def gen_hn_user_names_wrong_tool(rng, idx, tool):
     syn = rng.choice(tool.syn) if tool.syn else tool.obj_nom
     detail = ("; " + ", ".join(_human_phrase(p, s) for p, s in must)) if must else ""
     u = f"{subj}{wrong.obj_nom} gibi düşün ama tam o değil — aslında {syn}{detail}"
-    u = u[:1].upper() + u[1:]
+    u = _cap(u)
     u, reg = F.style(rng, u)
     _need = ([(subj_slot[0].human, subj_slot[1])] if subj_slot else []) + [(p.human, s) for p, s in must]
     u = _ensure_grounded(u, _need)

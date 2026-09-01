@@ -297,9 +297,14 @@ def gen_title(rng, pool=TITLES):
     return Slot(v, v, "text", {})
 
 
+def _tr_lower(s):
+    # 'İ'.lower() Python'da 'i̇' üretir; onu kullanmadan Türkçe küçült.
+    return s.replace("İ", "i").replace("I", "ı").lower()
+
+
 def gen_org_name(rng):
     v = rng.choice(ORG_UNITS)
-    surf = rng.choice([v, f"{v} birimi", f"{v} ekibi", f"{v} departmanı", v.lower()])
+    surf = rng.choice([v, f"{v} birimi", f"{v} ekibi", f"{v} departmanı", _tr_lower(v)])
     return Slot(v, surf, "org_name", {})
 
 
@@ -328,8 +333,8 @@ def gen_query(rng):
 
 
 def gen_email(rng):
-    fn = rng.choice(FIRST_NAMES).lower()
-    ln = rng.choice(LAST_NAMES).lower()
+    fn = _tr_lower(rng.choice(FIRST_NAMES))
+    ln = _tr_lower(rng.choice(LAST_NAMES))
     fold = str.maketrans("çğıöşü", "cgiosu")
     dom = rng.choice(["ornek.com", "sirket.com.tr", "firma.io", "mail.com"])
     v = f"{fn}.{ln}".translate(fold) + f"@{dom}"

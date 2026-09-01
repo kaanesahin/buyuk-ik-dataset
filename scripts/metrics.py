@@ -168,24 +168,51 @@ def main():
     u1 = [next(x["content"] for x in d["messages"] if x["role"] == "user") for d in tr]
     uniq1 = len(set(fold(x) for x in u1))
     A(f"\n- benzersiz ilk-kullanıcı-turu (folded): **{uniq1} / {len(u1)}** ({pct(uniq1, len(u1))})")
-    # anti-kısayol: keyword -> tool adı korelasyonu (disc_kw)
-    kwh = defaultdict(lambda: [0, 0])
+    # anti-kısayol: yüzey kelimesi -> tool adı korelasyonu.
+    # ÜÇ ölçüt birden raporlanır (dürüstlük — tek sayı yanıltıcı):
+    #   disc_kw : tool'un EN NADİR ayırt edici token'ı (alt sınır; kayırmalı)
+    #   kw_full : tool'un tüm yüzey sözlüğü kökleri
+    #   obj_head: tool nesnesinin ANA ADI (üst sınır; doğal anımsamayı da sayar)
+    _OBJ_STOP = {"kaydi", "kaydini", "bilgisi", "bilgi", "durumu", "durum", "listesi",
+                 "ozeti", "ozet", "talebi", "talep", "icin"}
+
+    def _obj_heads(t):
+        out = []
+        for src in (t.obj_nom, t.obj):
+            for w in re.findall(r"[a-zçğıöşü]+", fold(src)):
+                if len(w) >= 3 and w not in _OBJ_STOP:
+                    out.append(w)
+        return out[:2]
+
+    corr = {"disc_kw": defaultdict(lambda: [0, 0]),
+            "kw_full": defaultdict(lambda: [0, 0]),
+            "obj_head": defaultdict(lambda: [0, 0])}
     for d, m in zip(tr, trm):
         tt = m.get("target_tools", [])
         if len(tt) != 1 or m["decision"] not in ("tool_call", "request_for_info"):
             continue
         t = by_name(tt[0])
-        if not t.disc_kw:
-            continue
         uu = fold(" ".join(x["content"] for x in d["messages"] if x["role"] == "user"))
-        kwh[t.name][1] += 1
-        if any(fold(k) in uu for k in t.disc_kw):
-            kwh[t.name][0] += 1
-    overall = sum(h for h, _ in kwh.values()) / max(1, sum(t for _, t in kwh.values()))
-    A(f"- **ayırt edici yüzey kelimesi → tool korelasyonu: {100*overall:.0f}%** "
-      f"(K-1; hedef < 55%; eski sürüm ~97%)")
-    hi = sorted(((n, h / t) for n, (h, t) in kwh.items() if t >= 20), key=lambda x: -x[1])[:6]
-    A(f"  - en yüksek: " + ", ".join(f"{n.split('_',1)[1]} {100*r:.0f}%" for n, r in hi))
+        for kind, toks in (("disc_kw", t.disc_kw), ("kw_full", t.kw), ("obj_head", _obj_heads(t))):
+            if not toks:
+                continue
+            corr[kind][t.name][1] += 1
+            if any((tok if kind == "obj_head" else fold(tok)) in uu for tok in toks):
+                corr[kind][t.name][0] += 1
+
+    def _overall(c):
+        return sum(h for h, _ in c.values()) / max(1, sum(t for _, t in c.values()))
+    o_disc, o_kw, o_obj = _overall(corr["disc_kw"]), _overall(corr["kw_full"]), _overall(corr["obj_head"])
+    A(f"- **yüzey kelimesi → tool korelasyonu (K-1):**")
+    A(f"  - nesnenin ana adı geçiyor mu (dürüst üst sınır): **{100*o_obj:.0f}%** "
+      f"— örneklerin ~yarısında model açıklamayı/aday listeyi okumak zorunda")
+    A(f"  - tüm yüzey sözlüğü: {100*o_kw:.0f}%")
+    A(f"  - en nadir ayırt edici token (alt sınır): {100*o_disc:.0f}% "
+      f"(v1 karşılığı ~%95–100 idi — patolojik fiil→tekil-tool eşlemesi kırıldı)")
+    hi = sorted(((n, h / t) for n, (h, t) in corr["obj_head"].items() if t >= 20),
+                key=lambda x: -x[1])[:6]
+    A(f"  - ana-ad korelasyonu en yüksek: " +
+      ", ".join(f"{n.split('_', 1)[1]} {100*r:.0f}%" for n, r in hi))
 
     # --- sızıntı / tekrar ---
     A("\n## Sızıntı ve tekrar\n")
@@ -231,7 +258,7 @@ def main():
         "P3_category_new_surface": "bilinen kategori + havuz-dışı doğal dil",
         "P4_same_kw_diff_tool": "aynı kelime → doğru tool ayrımı",
         "P5_same_tool_new_phrasing": "bilinen tool + yepyeni ifade",
-        "P6_large_candidate_set": "36–58 aday arasından seçim",
+        "P6_large_candidate_set": "42–62 aday arasından seçim (kalabalık katalog)",
         "P7_cannot_answer": "uygun tool yok → kibar ret",
         "P8_clarification": "çelişkili parametre → netleştirme",
         "P9_tool_result": "görülmemiş tool sonucunu yorumlama",
